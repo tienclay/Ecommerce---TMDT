@@ -1,0 +1,54 @@
+{
+  "admin": [
+    {
+      "email": "admin@clay.com",
+      "firstName": "Clay",
+      "lastName": "Admin",
+      "username": "admin",
+      "password": "admin",
+      "phone": "0123456789",
+      "phoneCode": "VN",
+      "role": "ADMIN",
+      "status": "Active",
+      "avatar": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqr-iws-iuEk7DEaVmHc0RmOf_ZWdawJRAc3-kb2uAS95Kp89lrr8sqc0Y7_OZUHspbX8"
+    },
+    {
+      "email": "admin1@clay.com",
+      "firstName": "Jane",
+      "lastName": "Smith",
+      "username": "admin1",
+      "password": "admin1",
+      "phone": "0987654321",
+      "phoneCode": "US",
+      "role": "ADMIN",
+      "status": "ACTIVE",
+      "avatar": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqr-iws-iuEk7DEaVmHc0RmOf_ZWdawJRAc3-kb2uAS95Kp89lrr8sqc0Y7_OZUHspbX8"
+    }
+  ],
+  "client": [
+    {
+      "email": "client1@gmail.com",
+      "firstName": "Sam",
+      "lastName": "Wilson",
+      "username": "client1",
+      "password": "client1",
+      "phone": "555555555",
+      "phoneCode": "VN",
+      "role": "CLIENT",
+      "status": "ACTIVE",
+      "avatar": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfEw6x58GVszRe7uT16ePW_4wr20agrF7vaEBfEvuJUkR4cm35b3C5WjVQVNQym_lSL1w&usqp=CAU"
+    },
+    {
+      "email": "client2@gmail.com",
+      "firstName": "Will",
+      "lastName": "Smith",
+      "username": "client2",
+      "password": "client2",
+      "phone": "5555553124",
+      "phoneCode": "US",
+      "role": "CLIENT",
+      "status": "ACTIVE",
+      "avatar": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfEw6x58GVszRe7uT16ePW_4wr20agrF7vaEBfEvuJUkR4cm35b3C5WjVQVNQym_lSL1w&usqp=CAU"
+    }
+  ]
+}

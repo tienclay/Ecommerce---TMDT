@@ -1,0 +1,167 @@
+//Clay
+
+Table users {
+  id integer [primary key]
+  avatar varchar
+  first_name varchar
+  last_name varchar
+  username varchar [not null, unique]
+  email varchar [not null, unique]
+  password varchar
+  role enum
+  birth_of_date date
+  phone_number varchar
+  created_at timestamp
+  deleted_at timestamp
+}
+
+Table addresses {
+  id integer [primary key]
+  user_id integer
+  title varchar
+  address_line_1 varchar
+  address_line_2 varchar
+  country varchar
+  city varchar
+  postal_code varchar
+  landmark varchar
+  phone_number varchar
+  created_at timestamp
+  deleted_at timestamp
+}
+
+Table categories {
+  id integer [primary key]
+  name varchar
+  description varchar
+  created_at timestamp
+  deleted_at timestamp
+}
+
+Table sub_categories {
+  id integer [primary key]
+  parent_id integer
+  name varchar
+  description varchar
+  created_at timestamp
+  deleted_at timestamp
+}
+
+Table products {
+  id integer [primary key]
+  name varchar
+  description varchar
+  summary varchar
+  cover varchar
+  category_id varchar
+  created_at timestamp
+  deleted_at timestamp
+}
+
+enum product_attribute_type {
+    color
+    size
+}
+
+Table product_attributes {
+  id integer [primary key]
+  type product_attribute_type
+  value varchar
+  created_at timestamp
+  deleted_at timestamp
+}
+
+
+Table products_skus {
+  id integer [primary key]
+  product_id integer
+  size_attribute_id integer
+  color_attribute_id integer
+  sku varchar
+  price varchar
+  quantity integer
+  created_at timestamp
+  deleted_at timestamp
+}
+
+Table wishlist {
+  id integer [primary key]
+  user_id integer
+  product_id integer
+  created_at timestamp
+  deleted_at timestamp
+}
+
+Table cart {
+  id integer [primary key]
+  user_id integer
+  total integer
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table cart_item {
+  id integer [primary key]
+  cart_id integer
+  product_id integer
+  products_sku_id integer
+  quantity integer
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table order_details {
+  id integer [primary key]
+  user_id integer
+  payment_id integer
+  total integer
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table order_item {
+  id integer [primary key]
+  order_id integer
+  product_id integer
+  products_sku_id integer
+  quantity integer
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table payment_details {
+  id integer [primary key]
+  order_id integer
+  amount integer
+  provider varchar
+  status value
+  created_at timestamp
+  updated_at timestamp
+}
+
+
+
+
+
+Ref: addresses.user_id > users.id 
+
+Ref: sub_categories.parent_id > categories.id
+Ref: products.category_id <> sub_categories.id
+
+Ref: product_attributes.id <> products_skus.size_attribute_id
+Ref: product_attributes.id <> products_skus.color_attribute_id
+Ref: products_skus.product_id > products.id
+
+Ref: wishlist.user_id <> users.id
+Ref: wishlist.product_id <> products.id
+
+Ref: cart.user_id - users.id
+Ref: cart_item.cart_id > cart.id
+Ref: cart_item.product_id <> products.id
+Ref: cart_item.products_sku_id <> products_skus.id
+
+Ref: order_details.user_id < users.id
+Ref: order_item.order_id > order_details.id
+Ref: order_item.product_id <> products.id
+Ref: order_item.products_sku_id <> products_skus.id
+Ref: payment_details.order_id - order_details.id 
