@@ -1,42 +1,105 @@
-import { Column, Entity } from 'typeorm';
+// src/entities/user.entity.ts
+
+import { Exclude, Expose } from 'class-transformer';
+import {
+  Entity,
+  Column,
+  OneToOne,
+  OneToMany,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
 import { BaseEntity } from './base.entity';
-import { PhoneCode, UserStatus } from '@enums';
+import { Profile } from './profile.entity';
+import { Status } from './status.entity';
+import { Review } from './review.entity';
+import { Payment } from './payment.entity';
+import { Membership } from './membership.entity';
+import { Schedule } from './schedule.entity';
+import { Course } from './course.entity';
+import { Order } from './order.entity';
 
-@Entity()
+export enum UserRole {
+  TUTOR = 'TUTOR',
+  STUDENT = 'STUDENT',
+  ADMIN = 'ADMIN',
+}
+
+@Entity('users')
 export class User extends BaseEntity {
-  @Column({ type: 'varchar', nullable: true })
-  avatar: string;
-
-  @Column({ type: 'varchar', length: 255 })
-  firstName: string;
-
-  @Column({ type: 'varchar', length: 255 })
-  lastName: string;
-
-  @Column({ type: 'varchar', length: 255, unique: true })
+  @Column({ unique: true })
+  @Expose()
   username: string;
 
-  @Column({ type: 'varchar', length: 255, unique: true })
+  @Column()
+  @Exclude()
+  password_hash: string;
+
+  @Column({ unique: true })
+  @Expose()
   email: string;
 
-  @Column({ type: 'varchar', length: 255 })
-  password: string;
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.STUDENT,
+  })
+  @Expose()
+  role: UserRole;
 
-  @Column({ type: 'enum', enum: ['CLIENT', 'ADMIN'], default: 'CLIENT' })
-  role: string;
+  // One-to-One with Profile
+  @OneToOne(() => Profile, (profile) => profile.user, {
+    cascade: true,
+    eager: true,
+  })
+  profile: Profile;
 
-  @Column({ type: 'date', nullable: true })
-  birthOfDate: Date;
+  // One-to-Many with Status
+  @OneToMany(() => Status, (status) => status.user, {
+    cascade: true,
+  })
+  statuses: Status[];
 
-  @Column({ type: 'varchar', length: 20, nullable: true })
-  phoneNumber: string;
+  // One-to-Many with Review (as reviewer)
+  @OneToMany(() => Review, (review) => review.student, {
+    cascade: true,
+  })
+  givenReviews: Review[];
 
-  @Column({ type: 'enum', enum: PhoneCode })
-  phoneCode: PhoneCode;
+  // One-to-Many with Review (as reviewed)
+  @OneToMany(() => Review, (review) => review.tutor, {
+    cascade: true,
+  })
+  receivedReviews: Review[];
 
-  @Column({ type: 'enum', enum: UserStatus })
-  status: UserStatus;
+  // One-to-Many with Payment
+  @OneToMany(() => Payment, (payment) => payment.user, {
+    cascade: true,
+  })
+  payments: Payment[];
 
-  @Column({ type: 'text', nullable: true })
-  refreshToken?: string;
+  // One-to-Many with Membership
+  @OneToMany(() => Membership, (membership) => membership.user, {
+    cascade: true,
+  })
+  memberships: Membership[];
+
+  // One-to-Many with Schedule
+  @OneToMany(() => Schedule, (schedule) => schedule.user, {
+    cascade: true,
+  })
+  schedules: Schedule[];
+
+  // Many-to-Many with Course as Tutor
+  @ManyToMany(() => Course, (course) => course.tutors)
+  @JoinTable({
+    name: 'course_tutors',
+    joinColumn: { name: 'tutor_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'course_id', referencedColumnName: 'id' },
+  })
+  tutoringCourses: Course[];
+
+  // Many-to-Many with Course as Student via Order
+  @OneToMany(() => Order, (order) => order.student)
+  orders: Order[];
 }

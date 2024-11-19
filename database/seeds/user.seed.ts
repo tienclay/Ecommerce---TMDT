@@ -2,23 +2,23 @@ import { User } from '@entities';
 import { DataSource } from 'typeorm';
 import { Seeder } from 'typeorm-extension';
 import * as userData from './jsons/user.json';
-import { PhoneCode, UserRole, UserStatus } from '@enums';
+import { UserRole } from '@enums';
 import { hashPassword } from '@utils';
 
 export default class UserSeed implements Seeder {
   private async createUser(appDataSource: DataSource): Promise<any> {
     const adminData = userData.admin;
 
-    const UserData = userData.client;
+    const UserData = userData.student;
+
+    const tutorData = userData.tutor;
 
     const adminInput = await Promise.all(
       adminData.map(async (admin) => {
         return {
           ...admin,
-          password: await hashPassword(admin.password),
+          password_hash: await hashPassword(admin.password),
           role: UserRole.ADMIN,
-          phoneCode: PhoneCode[`${admin.phoneCode}`],
-          status: UserStatus.ACTIVE,
         };
       }),
     );
@@ -27,10 +27,18 @@ export default class UserSeed implements Seeder {
       UserData.map(async (user) => {
         return {
           ...user,
-          password: await hashPassword(user.password),
-          role: UserRole.CLIENT,
-          phoneCode: PhoneCode[`${user.phoneCode}`],
-          status: UserStatus.ACTIVE,
+          password_hash: await hashPassword(user.password),
+          role: UserRole.STUDENT,
+        };
+      }),
+    );
+
+    const tutorInput = await Promise.all(
+      tutorData.map(async (tutor) => {
+        return {
+          ...tutor,
+          password_hash: await hashPassword(tutor.password),
+          role: UserRole.TUTOR,
         };
       }),
     );
@@ -40,7 +48,7 @@ export default class UserSeed implements Seeder {
         .createQueryBuilder()
         .insert()
         .into(User)
-        .values([...adminInput, ...userInput])
+        .values([...adminInput, ...userInput, ...tutorInput])
         .execute();
     } catch (error: any) {
       throw new Error(error);
