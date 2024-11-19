@@ -2,7 +2,7 @@ import { User } from '@entities';
 import { DataSource } from 'typeorm';
 import { Seeder } from 'typeorm-extension';
 import * as userData from './jsons/user.json';
-import { UserRole } from '@enums';
+import { PhoneCode, UserRole, UserStatus } from '@enums';
 import { hashPassword } from '@utils';
 
 export default class UserSeed implements Seeder {
@@ -19,6 +19,8 @@ export default class UserSeed implements Seeder {
           ...admin,
           password_hash: await hashPassword(admin.password),
           role: UserRole.ADMIN,
+          phoneCode: PhoneCode[`${admin.phoneCode}`],
+          status: UserStatus.ACTIVE,
         };
       }),
     );
@@ -29,6 +31,8 @@ export default class UserSeed implements Seeder {
           ...user,
           password_hash: await hashPassword(user.password),
           role: UserRole.STUDENT,
+          phoneCode: PhoneCode[`${user.phoneCode}`],
+          status: UserStatus.ACTIVE,
         };
       }),
     );
@@ -39,6 +43,8 @@ export default class UserSeed implements Seeder {
           ...tutor,
           password_hash: await hashPassword(tutor.password),
           role: UserRole.TUTOR,
+          phoneCode: PhoneCode[`${tutor.phoneCode}`],
+          status: UserStatus.ACTIVE,
         };
       }),
     );
