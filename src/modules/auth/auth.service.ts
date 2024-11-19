@@ -19,7 +19,6 @@ import { AuthConfig } from '@config';
 import { JwtService } from '@nestjs/jwt';
 import { ResponseAuthDto } from './dto/response-auth.dto';
 import { GenerateTokenInfoDto } from './dto/generate-token-info.dto.js';
-import e from 'express';
 
 @Injectable()
 export class AuthService {
@@ -42,7 +41,7 @@ export class AuthService {
       }
       const hashedPassword = await hashPassword(createAuthDto.password);
       const hashedDto = { ...createAuthDto, password: hashedPassword };
-      const user = this.userRepository.create(hashedDto);
+      const user = this.userRepository.create(hashedDto as User);
       await this.userRepository.save(user);
       const { password, ...userOutput } = user;
       return plainToInstance(UserOutputDto, userOutput);

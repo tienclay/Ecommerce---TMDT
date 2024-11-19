@@ -9,10 +9,8 @@ import { WinstonModule, WinstonModuleOptions } from 'nest-winston';
 import { AuthModule } from './modules/auth/auth.module';
 import { GlobalHandleExceptionFilter } from '@exceptions';
 import { APP_FILTER } from '@nestjs/core';
-import { AddressModule } from './modules/address/address.module';
-import { CategoryModule } from './modules/category/category.module';
 
-const modules = [AuthModule, AddressModule, CategoryModule];
+const modules = [AuthModule];
 
 @Module({
   imports: [

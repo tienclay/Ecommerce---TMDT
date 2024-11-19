@@ -1,6 +1,5 @@
 // src/entities/user.entity.ts
 
-import { Exclude, Expose } from 'class-transformer';
 import {
   Entity,
   Column,
@@ -18,34 +17,49 @@ import { Membership } from './membership.entity';
 import { Schedule } from './schedule.entity';
 import { Course } from './course.entity';
 import { Order } from './order.entity';
-
-export enum UserRole {
-  TUTOR = 'TUTOR',
-  STUDENT = 'STUDENT',
-  ADMIN = 'ADMIN',
-}
+import { PhoneCode, UserRole, UserStatus } from '@enums';
 
 @Entity('users')
 export class User extends BaseEntity {
-  @Column({ unique: true })
-  @Expose()
+  @Column({ type: 'varchar', nullable: true })
+  avatar: string;
+
+  @Column({ type: 'varchar', length: 255 })
+  firstName: string;
+
+  @Column({ type: 'varchar', length: 255 })
+  lastName: string;
+
+  @Column({ type: 'varchar', length: 255, unique: true })
   username: string;
 
-  @Column()
-  @Exclude()
-  password_hash: string;
-
-  @Column({ unique: true })
-  @Expose()
+  @Column({ type: 'varchar', length: 255, unique: true })
   email: string;
+
+  @Column({ type: 'varchar', length: 255 })
+  password: string;
 
   @Column({
     type: 'enum',
     enum: UserRole,
     default: UserRole.STUDENT,
   })
-  @Expose()
   role: UserRole;
+
+  @Column({ type: 'date', nullable: true })
+  birthOfDate: Date;
+
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  phoneNumber: string;
+
+  @Column({ type: 'enum', enum: PhoneCode })
+  phoneCode: PhoneCode;
+
+  @Column({ type: 'enum', enum: UserStatus })
+  status: UserStatus;
+
+  @Column({ type: 'text', nullable: true })
+  refreshToken?: string;
 
   // One-to-One with Profile
   @OneToOne(() => Profile, (profile) => profile.user, {

@@ -1,38 +1,68 @@
 {
   "admin": [
     {
+      "firstName": "Clay",
+      "lastName": "Admin",
       "username": "admin",
       "password": "admin",
       "email": "admin@example.com",
-      "role": "ADMIN"
+      "role": "ADMIN",
+      "phone": "0123456789",
+      "phoneCode": "VN",
+      "status": "ACTIVE",
+      "avatar": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqr-iws-iuEk7DEaVmHc0RmOf_ZWdawJRAc3-kb2uAS95Kp89lrr8sqc0Y7_OZUHspbX8"
     }
   ],
   "student": [
     {
+      "firstName": "Alice",
+      "lastName": "Student",
       "username": "studentAlice",
       "password": "alice",
       "email": "alice.student@example.com",
-      "role": "STUDENT"
+      "role": "STUDENT",
+      "phone": "0123456798",
+      "phoneCode": "VN",
+      "status": "ACTIVE",
+      "avatar": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqr-iws-iuEk7DEaVmHc0RmOf_ZWdawJRAc3-kb2uAS95Kp89lrr8sqc0Y7_OZUHspbX8"
     },
     {
+      "firstName": "Bob",
+      "lastName": "Student",
       "username": "studentBob",
       "password": "bob",
       "email": "bob.student@example.com",
-      "role": "STUDENT"
+      "role": "STUDENT",
+      "phone": "0123456797",
+      "phoneCode": "VN",
+      "status": "ACTIVE",
+      "avatar": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfEw6x58GVszRe7uT16ePW_4wr20agrF7vaEBfEvuJUkR4cm35b3C5WjVQVNQym_lSL1w&usqp=CAU"
     }
   ],
   "tutor": [
     {
+      "firstName": "John",
+      "lastName": "Tutor",
       "username": "tutorJohn",
       "password": "john",
       "email": "john.tutor@example.com",
-      "role": "TUTOR"
+      "role": "TUTOR",
+      "phone": "0123456799",
+      "phoneCode": "VN",
+      "status": "ACTIVE",
+      "avatar": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfEw6x58GVszRe7uT16ePW_4wr20agrF7vaEBfEvuJUkR4cm35b3C5WjVQVNQym_lSL1w&usqp=CAU"
     },
     {
+      "firstName": "Emma",
+      "lastName": "Tutor",
       "username": "tutorEmma",
       "password": "emma",
       "email": "emma.tutor@example.com",
-      "role": "TUTOR"
+      "role": "TUTOR",
+      "phone": "0123456788",
+      "phoneCode": "VN",
+      "status": "ACTIVE",
+      "avatar": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqr-iws-iuEk7DEaVmHc0RmOf_ZWdawJRAc3-kb2uAS95Kp89lrr8sqc0Y7_OZUHspbX8"
     }
   ]
 }

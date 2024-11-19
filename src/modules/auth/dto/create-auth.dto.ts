@@ -7,7 +7,7 @@ import {
   Length,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { PhoneCode, UserStatus } from '@enums';
+import { PhoneCode, UserRole, UserStatus } from '@enums';
 
 export class CreateAuthDto {
   @ApiPropertyOptional({ type: String, description: 'Avatar URL of the user' })
@@ -65,13 +65,13 @@ export class CreateAuthDto {
   password: string;
 
   @ApiPropertyOptional({
-    enum: ['CLIENT', 'ADMIN'],
+    enum: UserRole,
     description: 'Role of the user',
-    default: 'CLIENT',
+    default: 'STUDENT',
   })
-  @IsEnum(['CLIENT', 'ADMIN'])
+  @IsEnum(UserRole)
   @IsOptional()
-  role: string = 'CLIENT';
+  role: string = 'STUDENT';
 
   @ApiPropertyOptional({
     type: Date,
