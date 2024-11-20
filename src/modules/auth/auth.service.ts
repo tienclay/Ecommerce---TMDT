@@ -83,7 +83,7 @@ export class AuthService {
   }
 
   async generateToken(user: GenerateTokenInfoDto): Promise<ResponseAuthDto> {
-    const payload = { email: user.email };
+    const payload = { email: user.email, id: user.id };
     const expiredIn = user.expiredIn
       ? user.expiredIn
       : AuthConfig.refreshTokenExpiration;

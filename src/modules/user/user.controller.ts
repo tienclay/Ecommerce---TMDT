@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Delete,
-  ForbiddenException,
-  Get,
-  Param,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Delete, Get, Param, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import {
   ApiBearerAuth,
@@ -20,6 +13,7 @@ import { EcommerceForbiddenException } from '@exceptions';
 import { UserInfoDto } from './dto/user-info.dto';
 import { UserRole } from '@enums';
 import { ProfileInfoDto } from '../profile/dto/profile-info.dto';
+import { ProfileId } from './dto/profile-id.dto';
 @Controller('users')
 @ApiTags('User')
 export class UserController {
@@ -45,26 +39,26 @@ export class UserController {
     return this.userService.findUserById(userId);
   }
 
-  // @Get('ProfileId')
-  // @UseGuards(AuthGuard)
-  // @ApiBearerAuth('access-token')
-  // @ApiOperation({ summary: 'Get ProfileId' })
-  // @ApiResponse({
-  //   status: 200,
-  //   description: 'ProfileId found',
-  //   type: ProfileInfoDto,
-  // })
-  // async findProfileId(
-  //   @Param('userId') userId: string,
-  //   @CurrentUser() user: User,
-  // ): Promise<UserInfoDto> {
-  //   if (user.role !== 'ADMIN' && user.id !== userId) {
-  //     throw new EcommerceForbiddenException(
-  //       'You are not allowed to access this resource',
-  //     );
-  //   }
-  //   return this.userService.findProfileId(userId);
-  // }
+  @Get(':userId/profileId')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get ProfileId' })
+  @ApiResponse({
+    status: 200,
+    description: 'ProfileId found',
+    type: ProfileId,
+  })
+  async findProfileId(
+    @Param('userId') userId: string,
+    @CurrentUser() user: User,
+  ): Promise<ProfileId> {
+    if (user.role !== 'ADMIN' && user.id !== userId) {
+      throw new EcommerceForbiddenException(
+        'You are not allowed to access this resource',
+      );
+    }
+    return this.userService.findProfileId(userId);
+  }
 
   @Delete(':userId')
   @UseGuards(AuthGuard, RolesGuard)

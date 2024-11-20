@@ -1,12 +1,12 @@
 import { plainToClass } from 'class-transformer';
 import { Profile, User } from '@entities';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { UserInfoDto } from './dto/user-info.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EcommerceNotFoundException } from '@exceptions';
 import { ProfileInfoDto } from '../profile/dto/profile-info.dto';
-import { applyRelations } from 'typeorm-extension';
+import { ProfileId } from './dto/profile-id.dto';
 
 @Injectable()
 export class UserService {
@@ -28,7 +28,7 @@ export class UserService {
     }
   }
 
-  async findProfileId(userId: string): Promise<ProfileInfoDto> {
+  async findProfileId(userId: string): Promise<ProfileId> {
     try {
       const profile = await this.profileRepository.findOne({
         where: { user: { id: userId } },
@@ -36,7 +36,7 @@ export class UserService {
       if (!profile) {
         throw new EcommerceNotFoundException('Profile not found');
       }
-      return plainToClass(ProfileInfoDto, profile);
+      return plainToClass(ProfileId, { id: profile.id });
     } catch (error) {
       throw error;
     }
