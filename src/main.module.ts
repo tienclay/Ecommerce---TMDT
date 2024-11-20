@@ -9,8 +9,10 @@ import { WinstonModule, WinstonModuleOptions } from 'nest-winston';
 import { AuthModule } from './modules/auth/auth.module';
 import { GlobalHandleExceptionFilter } from '@exceptions';
 import { APP_FILTER } from '@nestjs/core';
+import { UserModule } from './modules/user/user.module';
+import { ProfileModule } from './modules/profile/profile.module';
 
-const modules = [AuthModule];
+const modules = [AuthModule, UserModule];
 
 @Module({
   imports: [
@@ -51,6 +53,8 @@ const modules = [AuthModule];
       url: process.env.REDIS_URL,
     }),
     ...modules,
+    UserModule,
+    ProfileModule,
   ],
   providers: [
     {

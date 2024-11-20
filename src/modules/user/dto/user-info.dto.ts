@@ -1,8 +1,16 @@
-import { IsString, IsOptional, IsEmail, IsEnum, Length } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsEmail,
+  IsEnum,
+  IsDateString,
+  Length,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { UserRole, UserStatus } from '@enums';
-
-export class CreateAuthDto {
+import { PhoneCode, UserRole, UserStatus } from '@enums';
+import { Exclude, Expose } from 'class-transformer';
+@Exclude()
+export class UserInfoDto {
   @ApiProperty({
     type: String,
     description: 'Unique username',
@@ -11,6 +19,7 @@ export class CreateAuthDto {
   })
   @IsString()
   @Length(1, 255)
+  @Expose()
   username: string;
 
   @ApiProperty({
@@ -21,16 +30,8 @@ export class CreateAuthDto {
   })
   @IsEmail()
   @Length(1, 255)
+  @Expose()
   email: string;
-
-  @ApiProperty({
-    type: String,
-    description: 'Password for authentication',
-    maxLength: 255,
-  })
-  @IsString()
-  @Length(1, 255)
-  password: string;
 
   @ApiPropertyOptional({
     enum: UserRole,
@@ -39,8 +40,15 @@ export class CreateAuthDto {
   })
   @IsEnum(UserRole)
   @IsOptional()
+  @Expose()
   role: string = 'STUDENT';
 
+  @ApiPropertyOptional({
+    enum: UserStatus,
+    description: 'Status of the user',
+    example: 'ACTIVE',
+  })
   @IsEnum(UserStatus)
+  @Expose()
   status: UserStatus = UserStatus.ACTIVE;
 }

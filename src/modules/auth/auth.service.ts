@@ -19,6 +19,7 @@ import { AuthConfig } from '@config';
 import { JwtService } from '@nestjs/jwt';
 import { ResponseAuthDto } from './dto/response-auth.dto';
 import { GenerateTokenInfoDto } from './dto/generate-token-info.dto.js';
+import { profile } from 'console';
 
 @Injectable()
 export class AuthService {
@@ -40,11 +41,15 @@ export class AuthService {
         throw new EcommerceConflictException('Username already exist');
       }
       const hashedPassword = await hashPassword(createAuthDto.password);
-      const hashedDto = { ...createAuthDto, password: hashedPassword };
+      const hashedDto = {
+        ...createAuthDto,
+        password: hashedPassword,
+        profile: {},
+      };
       const user = this.userRepository.create(hashedDto as User);
       await this.userRepository.save(user);
-      const { password, ...userOutput } = user;
-      return plainToInstance(UserOutputDto, userOutput);
+      const userId = user.id;
+      return plainToInstance(UserOutputDto, userId);
     } catch (error) {
       throw error;
     }
@@ -95,7 +100,7 @@ export class AuthService {
     return `This action returns all auth`;
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return `This action returns a #${id} auth`;
   }
 

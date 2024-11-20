@@ -4,28 +4,36 @@ import { Expose } from 'class-transformer';
 import { Entity, Column, OneToOne, JoinColumn } from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { User } from './user.entity';
+import { PhoneCode } from '@enums';
 
 @Entity('profiles')
 export class Profile extends BaseEntity {
-  @Column()
-  @Expose()
-  name: string;
+  @Column({ type: 'varchar', nullable: true })
+  avatar?: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  firstName?: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  lastName?: string;
 
   @Column({ type: 'text', nullable: true })
   @Expose()
   bio?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   @Expose()
   address?: string;
 
-  @Column({ nullable: true })
-  @Expose()
-  phone_number?: string;
+  @Column({ type: 'date', nullable: true })
+  birthOfDate: Date;
 
-  @Column({ nullable: true })
+  @Column({ type: 'enum', enum: PhoneCode, nullable: true })
+  phoneCode?: PhoneCode;
+
+  @Column({ type: 'varchar', length: 20, nullable: true })
   @Expose()
-  avatar_url?: string;
+  phoneNumber?: string;
 
   // One-to-One with User
   @OneToOne(() => User, (user) => user.profile)

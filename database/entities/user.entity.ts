@@ -17,19 +17,10 @@ import { Membership } from './membership.entity';
 import { Schedule } from './schedule.entity';
 import { Course } from './course.entity';
 import { Order } from './order.entity';
-import { PhoneCode, UserRole, UserStatus } from '@enums';
+import { UserRole, UserStatus } from '@enums';
 
 @Entity('users')
 export class User extends BaseEntity {
-  @Column({ type: 'varchar', nullable: true })
-  avatar: string;
-
-  @Column({ type: 'varchar', length: 255 })
-  firstName: string;
-
-  @Column({ type: 'varchar', length: 255 })
-  lastName: string;
-
   @Column({ type: 'varchar', length: 255, unique: true })
   username: string;
 
@@ -45,15 +36,6 @@ export class User extends BaseEntity {
     default: UserRole.STUDENT,
   })
   role: UserRole;
-
-  @Column({ type: 'date', nullable: true })
-  birthOfDate: Date;
-
-  @Column({ type: 'varchar', length: 20, nullable: true })
-  phoneNumber: string;
-
-  @Column({ type: 'enum', enum: PhoneCode })
-  phoneCode: PhoneCode;
 
   @Column({ type: 'enum', enum: UserStatus })
   status: UserStatus;
