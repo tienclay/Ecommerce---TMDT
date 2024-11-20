@@ -17,17 +17,17 @@ export enum OrderStatus {
 @Entity('orders')
 export class Order extends BaseEntity {
   @Column()
-  student_id: string;
+  studentId: string;
 
   @Column()
-  course_id: string;
+  courseId: string;
 
   @Column()
-  course_fee_id: string;
+  courseFeeId: string;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   @Expose()
-  order_date: Date;
+  orderDate: Date;
 
   @Column({
     type: 'enum',
@@ -39,12 +39,11 @@ export class Order extends BaseEntity {
 
   @Column('decimal', { precision: 10, scale: 2 })
   @Expose()
-  total_amount: number;
+  totalAmount: number;
 
   // Many-to-One with User (Student)
   @ManyToOne(() => User, (user) => user.orders, {
     onDelete: 'CASCADE',
-    eager: true,
   })
   @JoinColumn({ name: 'student_id' })
   student: User;
@@ -52,7 +51,6 @@ export class Order extends BaseEntity {
   // Many-to-One with Course
   @ManyToOne(() => Course, (course) => course.orders, {
     onDelete: 'CASCADE',
-    eager: true,
   })
   @JoinColumn({ name: 'course_id' })
   course: Course;
@@ -60,7 +58,6 @@ export class Order extends BaseEntity {
   // Many-to-One with CourseFee
   @ManyToOne(() => CourseFee, (courseFee) => courseFee.id, {
     onDelete: 'CASCADE',
-    eager: true,
   })
   @JoinColumn({ name: 'course_fee_id' })
   courseFee: CourseFee;

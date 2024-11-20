@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { EcommerceNotFoundException } from '@exceptions';
 import { ProfileInfoDto } from '../profile/dto/profile-info.dto';
 import { ProfileId } from './dto/profile-id.dto';
+import { UserStatus } from '@enums';
 
 @Injectable()
 export class UserService {
@@ -31,7 +32,7 @@ export class UserService {
   async findProfileId(userId: string): Promise<ProfileId> {
     try {
       const profile = await this.profileRepository.findOne({
-        where: { user: { id: userId } },
+        where: { userId: userId },
       });
       if (!profile) {
         throw new EcommerceNotFoundException('Profile not found');
@@ -48,8 +49,8 @@ export class UserService {
       if (!user) {
         throw new EcommerceNotFoundException('User not found');
       }
-
-      await this.userRepository.delete({ id: userId });
+      user.status = UserStatus.INACTIVE;
+      await this.userRepository.save(user);
       return 'User deleted';
     } catch (error) {
       throw error;

@@ -12,12 +12,9 @@ export enum FeeType {
 
 @Entity('course_fees')
 export class CourseFee extends BaseEntity {
-  @Column()
-  course_id: string;
-
   @Column('decimal', { precision: 10, scale: 2 })
   @Expose()
-  fee_amount: number;
+  feeAmount: number;
 
   @Column({
     type: 'enum',
@@ -25,11 +22,14 @@ export class CourseFee extends BaseEntity {
     default: FeeType.ONE_TIME,
   })
   @Expose()
-  fee_type: FeeType;
+  feeType: FeeType;
 
   @Column({ type: 'text', nullable: true })
   @Expose()
   description?: string;
+
+  @Column({ type: 'uuid' })
+  courseId: string;
 
   // Many-to-One with Course
   @ManyToOne(() => Course, (course) => course.fees, {

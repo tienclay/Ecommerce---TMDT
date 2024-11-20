@@ -15,7 +15,7 @@ export enum MembershipType {
 @Entity('memberships')
 export class Membership extends BaseEntity {
   @Column()
-  user_id: string;
+  userId: string;
 
   @Column({
     type: 'enum',
@@ -23,23 +23,22 @@ export class Membership extends BaseEntity {
     default: MembershipType.BASIC,
   })
   @Expose()
-  membership_type: MembershipType;
+  membershipType: MembershipType;
 
   @Column({ type: 'date' })
   @Expose()
-  start_date: Date;
+  startDate: Date;
 
   @Column({ type: 'date' })
   @Expose()
-  end_date: Date;
+  endDate: Date;
 
   @Column({ nullable: true })
-  payment_id: string;
+  paymentId: string;
 
   // Many-to-One with User
   @ManyToOne(() => User, (user) => user.memberships, {
     onDelete: 'CASCADE',
-    eager: true,
   })
   @JoinColumn({ name: 'user_id' })
   user: User;

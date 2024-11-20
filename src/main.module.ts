@@ -11,6 +11,7 @@ import { GlobalHandleExceptionFilter } from '@exceptions';
 import { APP_FILTER } from '@nestjs/core';
 import { UserModule } from './modules/user/user.module';
 import { ProfileModule } from './modules/profile/profile.module';
+import { CourseModule } from './modules/course/course.module';
 
 const modules = [AuthModule, UserModule];
 
@@ -55,6 +56,7 @@ const modules = [AuthModule, UserModule];
     ...modules,
     UserModule,
     ProfileModule,
+    CourseModule,
   ],
   providers: [
     {

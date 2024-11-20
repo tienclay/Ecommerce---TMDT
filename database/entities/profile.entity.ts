@@ -35,6 +35,10 @@ export class Profile extends BaseEntity {
   @Expose()
   phoneNumber?: string;
 
+  @Column({ type: 'uuid' })
+  @Expose()
+  userId: string;
+
   // One-to-One with User
   @OneToOne(() => User, (user) => user.profile)
   @JoinColumn({ name: 'user_id' })

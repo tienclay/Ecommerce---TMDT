@@ -9,23 +9,22 @@ import { Location } from './location.entity';
 @Entity('schedules')
 export class Schedule extends BaseEntity {
   @Column()
-  user_id: string;
+  userId: string;
 
   @Column({ type: 'timestamp' })
   @Expose()
-  available_from: Date;
+  availableFrom: Date;
 
   @Column({ type: 'timestamp' })
   @Expose()
-  available_to: Date;
+  availableTo: Date;
 
   @Column({ nullable: true })
-  location_id?: string;
+  locationId?: string;
 
   // Many-to-One with User
   @ManyToOne(() => User, (user) => user.schedules, {
     onDelete: 'CASCADE',
-    eager: true,
   })
   @JoinColumn({ name: 'user_id' })
   user: User;
@@ -33,7 +32,6 @@ export class Schedule extends BaseEntity {
   // Many-to-One with Location
   @ManyToOne(() => Location, (location) => location.schedules, {
     onDelete: 'SET NULL',
-    eager: true,
   })
   @JoinColumn({ name: 'location_id' })
   location?: Location;

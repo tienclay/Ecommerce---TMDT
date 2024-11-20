@@ -50,7 +50,7 @@ export class ProfileController {
     description: 'Profile found',
     type: ProfileInfoDto,
   })
-  findProfileByUserId(@Param('profileId') userId: string, @CurrentUser() user) {
+  findProfileByUserId(@Param('userId') userId: string, @CurrentUser() user) {
     if (user.id !== userId) {
       throw new EcommerceForbiddenException(
         'You are not allowed to access this resource',

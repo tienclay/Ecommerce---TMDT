@@ -10,11 +10,11 @@ import { Schedule } from './schedule.entity';
 export class Location extends BaseEntity {
   @Column()
   @Expose()
-  address_line1: string;
+  addressLine1: string;
 
   @Column({ nullable: true })
   @Expose()
-  address_line2?: string;
+  addressLine2?: string;
 
   @Column()
   @Expose()
@@ -26,7 +26,7 @@ export class Location extends BaseEntity {
 
   @Column()
   @Expose()
-  zip_code: string;
+  zipCode: string;
 
   @Column()
   @Expose()

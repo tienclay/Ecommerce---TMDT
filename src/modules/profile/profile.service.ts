@@ -26,12 +26,12 @@ export class ProfileService {
   async findProfileByUserId(userId: string): Promise<ProfileInfoDto> {
     try {
       const profile = await this.profileRepository.findOne({
-        where: { user: { id: userId } },
+        where: { userId: userId },
       });
       if (!profile) {
         throw new EcommerceNotFoundException('Profile not found');
       }
-      return plainToClass(ProfileInfoDto, profile.id);
+      return plainToClass(ProfileInfoDto, profile);
     } catch (error) {
       throw error;
     }

@@ -9,23 +9,22 @@ import { Like } from './like.entity';
 @Entity('statuses')
 export class Status extends BaseEntity {
   @Column()
-  user_id: string;
+  userId: string;
 
   @Column({ type: 'text' })
   @Expose()
   content: string;
 
   @Column({ nullable: true })
-  parent_status_id?: string;
+  parentStatusId?: string;
 
   @Column({ default: 0 })
   @Expose()
-  likes_count: number;
+  likesCount: number;
 
   // Many-to-One with User
   @ManyToOne(() => User, (user) => user.statuses, {
     onDelete: 'CASCADE',
-    eager: true,
   })
   @JoinColumn({ name: 'user_id' })
   user: User;

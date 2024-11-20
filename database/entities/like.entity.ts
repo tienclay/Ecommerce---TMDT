@@ -8,15 +8,14 @@ import { Status } from './status.entity';
 @Entity('likes')
 export class Like extends BaseEntity {
   @Column()
-  user_id: string;
+  userId: string;
 
   @Column()
-  status_id: string;
+  statusId: string;
 
   // Many-to-One with User
   @ManyToOne(() => User, (user) => user.payments, {
     onDelete: 'CASCADE',
-    eager: true,
   })
   @JoinColumn({ name: 'user_id' })
   user: User;

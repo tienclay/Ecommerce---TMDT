@@ -68,6 +68,14 @@ export class AuthService {
       const { email, password } = loginDto;
       const user = await this.userRepository.findOne({
         where: { email: email },
+        select: {
+          id: true,
+          email: true,
+          password: true, // needed for password comparison
+          status: true,
+          role: true,
+          refreshToken: true,
+        },
       });
       if (!user) {
         throw new EcommerceNotFoundException('Email not found');

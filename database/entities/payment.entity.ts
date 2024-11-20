@@ -22,10 +22,10 @@ export enum PaymentStatus {
 @Entity('payments')
 export class Payment extends BaseEntity {
   @Column()
-  order_id: string;
+  orderId: string;
 
   @Column({ nullable: true })
-  membership_id: string;
+  membershipId: string;
 
   @Column('decimal', { precision: 10, scale: 2 })
   @Expose()
@@ -33,7 +33,7 @@ export class Payment extends BaseEntity {
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   @Expose()
-  payment_date: Date;
+  paymentDate: Date;
 
   @Column({
     type: 'enum',
@@ -41,7 +41,7 @@ export class Payment extends BaseEntity {
     default: PaymentMethod.CREDIT_CARD,
   })
   @Expose()
-  payment_method: PaymentMethod;
+  paymentMethod: PaymentMethod;
 
   @Column({
     type: 'enum',
@@ -68,7 +68,6 @@ export class Payment extends BaseEntity {
   // Many-to-One with User
   @ManyToOne(() => User, (user) => user.payments, {
     onDelete: 'CASCADE',
-    eager: true,
   })
   @JoinColumn({ name: 'user_id' })
   user: User;

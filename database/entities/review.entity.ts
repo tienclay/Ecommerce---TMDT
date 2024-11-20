@@ -8,10 +8,10 @@ import { User } from './user.entity';
 @Entity('reviews')
 export class Review extends BaseEntity {
   @Column()
-  student_id: string;
+  studentId: string;
 
   @Column()
-  tutor_id: string;
+  tutorId: string;
 
   @Column('int')
   @Expose()
@@ -24,7 +24,6 @@ export class Review extends BaseEntity {
   // Many-to-One with User (Student)
   @ManyToOne(() => User, (user) => user.givenReviews, {
     onDelete: 'CASCADE',
-    eager: true,
   })
   @JoinColumn({ name: 'student_id' })
   student: User;
@@ -32,7 +31,6 @@ export class Review extends BaseEntity {
   // Many-to-One with User (Tutor)
   @ManyToOne(() => User, (user) => user.receivedReviews, {
     onDelete: 'CASCADE',
-    eager: true,
   })
   @JoinColumn({ name: 'tutor_id' })
   tutor: User;
