@@ -48,6 +48,7 @@ export class AuthController {
 
   @Post('generate-token')
   @UseGuards(TokenGuard)
+  @ApiOperation({ summary: 'Generate token' })
   @ApiHeader({
     name: 'x-refresh-token',
   })

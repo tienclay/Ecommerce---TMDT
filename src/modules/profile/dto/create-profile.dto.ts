@@ -48,7 +48,7 @@ export class CreateProfileDto {
     description: 'Address of the user',
     example: '123 Street, City, Country',
   })
-  @IsEmail()
+  @IsString()
   address?: string;
 
   @ApiPropertyOptional({

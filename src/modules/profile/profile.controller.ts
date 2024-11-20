@@ -59,9 +59,20 @@ export class ProfileController {
     return this.profileService.findProfileByUserId(userId);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProfileDto: UpdateProfileDto) {
-    return this.profileService.update(+id, updateProfileDto);
+  @Patch(':profileId')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Update profile by id' })
+  @ApiResponse({
+    status: 200,
+    description: 'Profile updated',
+    type: ProfileInfoDto,
+  })
+  async update(
+    @Param('profileId') profileId: string,
+    @Body() updateProfileDto: UpdateProfileDto,
+  ): Promise<ProfileInfoDto> {
+    return this.profileService.update(profileId, updateProfileDto);
   }
 
   @Delete(':id')

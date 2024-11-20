@@ -8,11 +8,14 @@ import {
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { PhoneCode } from '@enums';
+import { Exclude, Expose } from 'class-transformer';
 
+@Exclude()
 export class ProfileInfoDto {
   @ApiPropertyOptional({ type: String, description: 'Avatar URL of the user' })
   @IsOptional()
   @IsString()
+  @Expose()
   avatar?: string;
 
   @ApiProperty({
@@ -23,6 +26,7 @@ export class ProfileInfoDto {
   })
   @IsString()
   @Length(1, 255)
+  @Expose()
   firstName?: string;
 
   @ApiProperty({
@@ -33,6 +37,7 @@ export class ProfileInfoDto {
   })
   @IsString()
   @Length(1, 255)
+  @Expose()
   lastName?: string;
 
   @ApiProperty({
@@ -41,6 +46,7 @@ export class ProfileInfoDto {
     example: 'I am a software engineer',
   })
   @IsString()
+  @Expose()
   bio?: string;
 
   @ApiProperty({
@@ -49,6 +55,7 @@ export class ProfileInfoDto {
     example: '123 Street, City, Country',
   })
   @IsEmail()
+  @Expose()
   address?: string;
 
   @ApiPropertyOptional({
@@ -58,6 +65,7 @@ export class ProfileInfoDto {
   })
   @IsOptional()
   @IsDateString()
+  @Expose()
   birthOfDate?: Date;
 
   @ApiPropertyOptional({
@@ -68,9 +76,11 @@ export class ProfileInfoDto {
   @IsOptional()
   @IsString()
   @Length(1, 20)
+  @Expose()
   phoneNumber?: string;
 
   @ApiPropertyOptional({ enum: PhoneCode, description: 'Phone country code' })
   @IsEnum(PhoneCode)
+  @Expose()
   phoneCode?: PhoneCode;
 }

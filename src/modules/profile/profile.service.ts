@@ -37,8 +37,25 @@ export class ProfileService {
     }
   }
 
-  update(id: number, updateProfileDto: UpdateProfileDto) {
-    return `This action updates a #${id} profile`;
+  async update(
+    profileId: string,
+    updateProfileDto: UpdateProfileDto,
+  ): Promise<ProfileInfoDto> {
+    try {
+      const profile = await this.profileRepository.findOne({
+        where: { id: profileId },
+      });
+      if (!profile) {
+        throw new EcommerceNotFoundException('Profile not found');
+      }
+      const updatedProfile = await this.profileRepository.save({
+        ...profile,
+        ...updateProfileDto,
+      });
+      return plainToClass(ProfileInfoDto, updatedProfile);
+    } catch (error) {
+      throw error;
+    }
   }
 
   remove(id: number) {
