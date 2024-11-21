@@ -36,11 +36,11 @@ export class Location extends BaseEntity {
   @OneToMany(() => Course, (course) => course.location, {
     cascade: true,
   })
-  courses: Course[];
+  courses?: Course[];
 
   // One-to-Many with Schedule
   @OneToMany(() => Schedule, (schedule) => schedule.location, {
     cascade: true,
   })
-  schedules: Schedule[];
+  schedules?: Schedule[];
 }

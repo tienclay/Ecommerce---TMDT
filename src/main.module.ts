@@ -12,6 +12,9 @@ import { APP_FILTER } from '@nestjs/core';
 import { UserModule } from './modules/user/user.module';
 import { ProfileModule } from './modules/profile/profile.module';
 import { CourseModule } from './modules/course/course.module';
+import { CourseFeeModule } from './modules/course-fee/course-fee.module';
+import { LocationModule } from './modules/location/location.module';
+import { ScheduleModule } from './modules/schedule/schedule.module';
 
 const modules = [AuthModule, UserModule];
 
@@ -57,6 +60,9 @@ const modules = [AuthModule, UserModule];
     UserModule,
     ProfileModule,
     CourseModule,
+    CourseFeeModule,
+    LocationModule,
+    ScheduleModule,
   ],
   providers: [
     {

@@ -1,13 +1,6 @@
-import {
-  IsString,
-  IsOptional,
-  IsEmail,
-  IsEnum,
-  IsDateString,
-  Length,
-} from 'class-validator';
+import { IsString, IsOptional, IsEmail, IsEnum, Length } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { PhoneCode, UserRole, UserStatus } from '@enums';
+import { UserRole, UserStatus } from '@enums';
 import { Exclude, Expose } from 'class-transformer';
 @Exclude()
 export class UserInfoDto {

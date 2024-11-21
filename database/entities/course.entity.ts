@@ -29,7 +29,7 @@ export class Course extends BaseEntity {
   @Expose()
   duration: string; // e.g., "10 weeks"
 
-  @Column()
+  @Column({ type: 'uuid' })
   locationId: string;
 
   @Column({ type: 'text', nullable: true })
@@ -47,7 +47,7 @@ export class Course extends BaseEntity {
   fees: CourseFee[];
 
   // Many-to-One with Location
-  @ManyToOne(() => Location, (location) => location.courses, {})
+  @ManyToOne(() => Location, (location) => location.courses)
   @JoinColumn({ name: 'location_id' })
   location: Location;
 
