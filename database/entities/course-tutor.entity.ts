@@ -1,6 +1,6 @@
 // src/entities/course-tutor.entity.ts
 
-import { Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Course } from './course.entity';
 import { User } from './user.entity';
 
@@ -8,6 +8,12 @@ import { User } from './user.entity';
 export class CourseTutor {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column({ type: 'uuid' })
+  courseId: string;
+
+  @Column({ type: 'uuid' })
+  tutorId: string;
 
   @ManyToOne(() => Course, (course) => course.tutors, {
     onDelete: 'CASCADE',

@@ -25,7 +25,7 @@ export class CourseController {
   @Post()
   @UseGuards(AuthGuard, RolesGuard)
   @ApiBearerAuth('access-token')
-  @Roles(UserRole.TUTOR)
+  @Roles(UserRole.TUTOR, UserRole.ADMIN)
   @ApiResponse({
     status: 201,
     description: 'Course created',
@@ -51,7 +51,7 @@ export class CourseController {
   @Patch(':courseId')
   @UseGuards(AuthGuard, RolesGuard)
   @ApiBearerAuth('access-token')
-  @Roles(UserRole.TUTOR)
+  @Roles(UserRole.ADMIN)
   @ApiResponse({
     status: 200,
     description: 'Course updated',
@@ -67,12 +67,27 @@ export class CourseController {
   @Delete(':courseId')
   @UseGuards(AuthGuard, RolesGuard)
   @ApiBearerAuth('access-token')
-  @Roles(UserRole.TUTOR)
+  @Roles(UserRole.ADMIN)
   @ApiResponse({
     status: 200,
     description: 'Course deleted',
   })
   async remove(@Param('courseId') id: string): Promise<string> {
     return this.courseService.remove(id);
+  }
+
+  @Post(':courseId/assign-tutor/')
+  @UseGuards(AuthGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @Roles(UserRole.ADMIN)
+  @ApiResponse({
+    status: 200,
+    description: 'Tutor assigned to course',
+  })
+  async assignTutorToCourse(
+    @Param('courseId') courseId: string,
+    @Body() assignTutorDto: string[],
+  ): Promise<string> {
+    return this.courseService.assignTutorToCourse(courseId, assignTutorDto);
   }
 }

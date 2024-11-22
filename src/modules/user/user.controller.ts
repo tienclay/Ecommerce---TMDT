@@ -7,13 +7,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { AuthGuard, RolesGuard } from '@guards';
-import { CurrentUser, Roles } from '@decorators';
+import { CurrentUser, EcommerceApiResponse, Roles } from '@decorators';
 import { User } from '@entities';
 import { EcommerceForbiddenException } from '@exceptions';
 import { UserInfoDto } from './dto/user-info.dto';
 import { UserRole } from '@enums';
-import { ProfileInfoDto } from '../profile/dto/profile-info.dto';
 import { ProfileId } from './dto/profile-id.dto';
+import { CourseInfoDto } from '../course/dto/course-info.dto';
 @Controller('users')
 @ApiTags('User')
 export class UserController {
@@ -71,5 +71,17 @@ export class UserController {
   })
   async deleteUserById(@Param('userId') userId: string): Promise<string> {
     return this.userService.deleteUserById(userId);
+  }
+
+  @Get(':userId/courses')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.TUTOR)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get courses by user id' })
+  @EcommerceApiResponse(CourseInfoDto, true)
+  async getCoursesByUserId(
+    @Param('userId') userId: string,
+  ): Promise<CourseInfoDto[]> {
+    return this.userService.getCoursesByUserId(userId);
   }
 }
