@@ -34,6 +34,7 @@ export class AuthGuard implements CanActivate {
       }
       const email = payload.email;
       const user = await this.userRepository.findOneBy({ email });
+      console.log('request :>> ', request.body);
       if (!user) {
         throw new UnauthorizedException('Invalid token');
       }
@@ -46,6 +47,7 @@ export class AuthGuard implements CanActivate {
   }
 
   private extractTokenFromHeader(request: Request): string | undefined {
+    console.log('request :>> ', request.body);
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;
   }

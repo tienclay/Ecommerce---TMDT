@@ -15,6 +15,7 @@ import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Roles } from '@decorators';
 import { UserRole } from '@enums';
 import { AuthGuard, RolesGuard } from '@guards';
+import { CourseInfoDto } from './dto/course-info.dto';
 
 @Controller('courses')
 @ApiTags('Course')
@@ -24,15 +25,16 @@ export class CourseController {
   @Post()
   @UseGuards(AuthGuard, RolesGuard)
   @ApiBearerAuth('access-token')
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.TUTOR)
   @ApiResponse({
     status: 201,
     description: 'Course created',
-    type: CreateCourseDto,
+    type: CourseInfoDto,
   })
   async create(
     @Body() createCourseDto: CreateCourseDto,
-  ): Promise<CreateCourseDto> {
+  ): Promise<CourseInfoDto> {
+    console.log('createCourseDto :>> ', createCourseDto);
     return this.courseService.create(createCourseDto);
   }
 
@@ -46,13 +48,31 @@ export class CourseController {
     return this.courseService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCourseDto: UpdateCourseDto) {
-    return this.courseService.update(+id, updateCourseDto);
+  @Patch(':courseId')
+  @UseGuards(AuthGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @Roles(UserRole.TUTOR)
+  @ApiResponse({
+    status: 200,
+    description: 'Course updated',
+    type: UpdateCourseDto,
+  })
+  async update(
+    @Param('courseId') id: string,
+    @Body() updateCourseDto: UpdateCourseDto,
+  ): Promise<CourseInfoDto> {
+    return this.courseService.update(id, updateCourseDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.courseService.remove(+id);
+  @Delete(':courseId')
+  @UseGuards(AuthGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @Roles(UserRole.TUTOR)
+  @ApiResponse({
+    status: 200,
+    description: 'Course deleted',
+  })
+  async remove(@Param('courseId') id: string): Promise<string> {
+    return this.courseService.remove(id);
   }
 }

@@ -6,6 +6,7 @@ import { Course, Order, User } from '@entities';
 import { DeepPartial, Repository } from 'typeorm';
 import { CourseInfoDto } from './dto/course-info.dto';
 import { plainToClass } from 'class-transformer';
+import { EcommerceNotFoundException } from '@exceptions';
 
 @Injectable()
 export class CourseService {
@@ -16,20 +17,8 @@ export class CourseService {
   async create(createCourseDto: CreateCourseDto): Promise<CourseInfoDto> {
     try {
       // Create course with proper typing
-      const courseData: DeepPartial<Course> = {
-        name: createCourseDto.name,
-        subject: createCourseDto.subject,
-        duration: createCourseDto.duration,
-        description: createCourseDto.description,
-        locationId: createCourseDto.locationId,
-        fees: createCourseDto.fees?.map((fee) => ({
-          feeAmount: fee.feeAmount,
-          feeType: fee.feeType,
-          description: fee.description,
-        })),
-      };
-
-      const course = this.courseRepository.create(courseData);
+      console.log('createCourseDto :>> ', createCourseDto);
+      const course = this.courseRepository.create(createCourseDto);
       const saveCourse = await this.courseRepository.save(course);
       return plainToClass(CourseInfoDto, saveCourse);
     } catch (error) {
@@ -45,11 +34,35 @@ export class CourseService {
     return `This action returns a #${id} course`;
   }
 
-  update(id: number, updateCourseDto: UpdateCourseDto) {
-    return `This action updates a #${id} course`;
+  async update(
+    id: string,
+    updateCourseDto: UpdateCourseDto,
+  ): Promise<CourseInfoDto> {
+    try {
+      const course = await this.courseRepository.findOne({ where: { id } });
+      if (!course) {
+        throw new EcommerceNotFoundException('Course not found');
+      }
+      const updatedCourse = await this.courseRepository.save({
+        ...course,
+        ...updateCourseDto,
+      });
+      return plainToClass(CourseInfoDto, updatedCourse);
+    } catch (error) {
+      throw new Error(`Failed to update course: ${error.message}`);
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} course`;
+  async remove(id: string): Promise<string> {
+    try {
+      const course = await this.courseRepository.findOne({ where: { id } });
+      if (!course) {
+        throw new EcommerceNotFoundException('Course not found');
+      }
+      await this.courseRepository.remove(course);
+      return 'Course deleted';
+    } catch (error) {
+      throw new Error(`Failed to delete course: ${error.message}`);
+    }
   }
 }
