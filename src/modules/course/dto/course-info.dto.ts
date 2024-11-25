@@ -2,7 +2,7 @@ import { Expose, Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { LocationInfoDto } from 'src/modules/location/dto/location-info.dto';
 import { UserInfoDto } from 'src/modules/user/dto/user-info.dto';
-import { CourseFeeInfoDto } from 'src/modules/course-fee/dto/course-fee-info.dto';
+import { CourseFeeDto } from 'src/modules/course-fee/dto/course-fee-info.dto';
 
 export class CourseInfoDto {
   @ApiProperty({
@@ -68,6 +68,6 @@ export class CourseInfoDto {
     type: [CourseInfoDto],
   })
   @Expose()
-  @Type(() => CourseFeeInfoDto) // Chuyển đổi danh sách CourseFee sang DTO
-  fees?: CourseFeeInfoDto[];
+  @Type(() => CourseFeeDto) // Chuyển đổi danh sách CourseFee sang DTO
+  fees?: CourseFeeDto[];
 }

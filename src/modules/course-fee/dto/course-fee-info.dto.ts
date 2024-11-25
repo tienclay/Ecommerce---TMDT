@@ -1,40 +1,56 @@
-import { FeeType } from '@entities';
-import { ApiProperty } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
+// src/course-fee/dto/course-fee.dto.ts
 
-export class CourseFeeInfoDto {
+import { Course, FeeType } from '@entities';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+
+export class CourseFeeDto {
   @ApiProperty({
-    description: 'Course fee ID',
-    example: '123e4567-e',
+    description: 'ID của phí khóa học',
+    example: 'courseFee-12345',
   })
-  @Expose()
   id: string;
 
   @ApiProperty({
-    description: 'Fee amount',
-    example: 100,
+    description: 'Số tiền phí khóa học',
+    example: 200.0,
   })
-  @Expose()
   feeAmount: number;
 
   @ApiProperty({
-    description: 'Fee type',
-    example: 'One-time',
+    description: 'Loại phí',
+    enum: FeeType,
+    example: FeeType.ONE_TIME,
   })
-  @Expose()
   feeType: FeeType;
 
-  @ApiProperty({
-    description: 'Description',
-    example: 'One-time fee for the course',
+  @ApiPropertyOptional({
+    description: 'Mô tả về phí khóa học',
+    example: 'Phí đăng ký một lần cho khóa học lập trình nâng cao.',
   })
-  @Expose()
   description?: string;
 
   @ApiProperty({
-    description: 'Course ID',
-    example: '123e4567-e',
+    description: 'ID của khóa học liên kết với phí này',
+    example: 'course-67890',
   })
-  @Expose()
   courseId: string;
+
+  @ApiProperty({
+    description: 'Thông tin khóa học liên kết',
+    type: () => Course,
+    nullable: true,
+  })
+  course?: Course;
+
+  @ApiProperty({
+    description: 'Ngày tạo phí khóa học',
+    example: '2024-04-01T10:00:00Z',
+  })
+  createdAt: Date;
+
+  @ApiProperty({
+    description: 'Ngày cập nhật phí khóa học',
+    example: '2024-04-02T12:00:00Z',
+  })
+  updatedAt: Date;
 }
