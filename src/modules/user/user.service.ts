@@ -1,13 +1,14 @@
+import { EcommerceBadRequestException } from './../../common/infra-exception/exception';
 import { plainToClass } from 'class-transformer';
-import { Course, Profile, User } from '@entities';
-import { Injectable } from '@nestjs/common';
+import { Course, CourseTutor, Order, Profile, User } from '@entities';
+import { Inject, Injectable } from '@nestjs/common';
 import { In, Repository } from 'typeorm';
 import { UserInfoDto } from './dto/user-info.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EcommerceNotFoundException } from '@exceptions';
 import { ProfileInfoDto } from '../profile/dto/profile-info.dto';
 import { ProfileId } from './dto/profile-id.dto';
-import { UserStatus } from '@enums';
+import { UserRole, UserStatus } from '@enums';
 import { CourseInfoDto } from '../course/dto/course-info.dto';
 
 @Injectable()
@@ -17,8 +18,10 @@ export class UserService {
     private userRepository: Repository<User>,
     @InjectRepository(Profile)
     private profileRepository: Repository<Profile>,
-    @InjectRepository(Course)
-    private courseRepository: Repository<Course>,
+    @InjectRepository(CourseTutor)
+    private courseTutorRepository: Repository<CourseTutor>,
+    @InjectRepository(Order)
+    private orderRepository: Repository<Order>,
   ) {}
   async findUserById(userId: string): Promise<UserInfoDto> {
     try {
@@ -62,16 +65,40 @@ export class UserService {
 
   async getCoursesByUserId(userId: string): Promise<CourseInfoDto[]> {
     try {
-      const user = await this.userRepository.findOne({ where: { id: userId } });
+      const user = await this.userRepository.findOne({
+        where: { id: userId },
+      });
+
       if (!user) {
         throw new EcommerceNotFoundException('User not found');
       }
-      const courses = await this.courseRepository.find({
-        where: { id: userId },
-      });
-      return courses.map((course) => plainToClass(CourseInfoDto, course));
+
+      let courses: Course[] = [];
+
+      if (user.role === UserRole.STUDENT) {
+        // Get courses from orders for students
+        const orders = await this.orderRepository.find({
+          where: { studentId: userId },
+          relations: ['course'],
+        });
+        courses = orders.map((order) => order.course);
+      } else if (user.role === UserRole.TUTOR) {
+        // Get assigned courses for tutors
+        const courseTutors = await this.courseTutorRepository.find({
+          where: { tutorId: userId },
+          relations: ['course'],
+        });
+        console.log('courseTutors :>> ', courseTutors);
+        courses = courseTutors.map((ct) => ct.course);
+      }
+
+      return courses.map((course) =>
+        plainToClass(CourseInfoDto, course, { excludeExtraneousValues: true }),
+      );
     } catch (error) {
-      throw error;
+      throw new EcommerceBadRequestException(
+        `Failed to get courses: ${error.message}`,
+      );
     }
   }
 }

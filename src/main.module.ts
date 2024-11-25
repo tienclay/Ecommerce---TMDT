@@ -15,6 +15,8 @@ import { CourseModule } from './modules/course/course.module';
 import { CourseFeeModule } from './modules/course-fee/course-fee.module';
 import { LocationModule } from './modules/location/location.module';
 import { ScheduleModule } from './modules/schedule/schedule.module';
+import { PaymentModule } from './modules/payment/payment.module';
+import { OrderModule } from './modules/order/order.module';
 
 const modules = [AuthModule, UserModule];
 
@@ -63,6 +65,8 @@ const modules = [AuthModule, UserModule];
     CourseFeeModule,
     LocationModule,
     ScheduleModule,
+    PaymentModule,
+    OrderModule,
   ],
   providers: [
     {

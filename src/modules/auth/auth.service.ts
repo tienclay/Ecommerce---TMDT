@@ -5,11 +5,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '@entities';
 import {
-  EcommerceBadRequestException,
   EcommerceConflictException,
   EcommerceNotFoundException,
   EcommerceUnauthorizedException,
-  InternalServerError,
 } from '@exceptions';
 import { comparePassword, hashPassword } from '@utils';
 import { plainToInstance } from 'class-transformer';
@@ -18,8 +16,7 @@ import { LoginDto } from './dto/login-input.dto';
 import { AuthConfig } from '@config';
 import { JwtService } from '@nestjs/jwt';
 import { ResponseAuthDto } from './dto/response-auth.dto';
-import { GenerateTokenInfoDto } from './dto/generate-token-info.dto.js';
-import { profile } from 'console';
+import { GenerateTokenInfoDto } from './dto/generate-token-info.dto';
 
 @Injectable()
 export class AuthService {

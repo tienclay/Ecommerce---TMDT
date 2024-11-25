@@ -1,19 +1,12 @@
 // src/entities/course.entity.ts
 
 import { Expose } from 'class-transformer';
-import {
-  Entity,
-  Column,
-  ManyToMany,
-  OneToMany,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
+import { Entity, Column, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
 import { BaseEntity } from './base.entity';
-import { User } from './user.entity';
 import { CourseFee } from './course-fee.entity';
 import { Location } from './location.entity';
 import { Order } from './order.entity';
+import { CourseTutor } from './course-tutor.entity';
 
 @Entity('courses')
 export class Course extends BaseEntity {
@@ -36,9 +29,10 @@ export class Course extends BaseEntity {
   @Expose()
   description?: string;
 
-  // Many-to-Many with User as Tutors
-  @ManyToMany(() => User, (user) => user.tutoringCourses)
-  tutors: User[];
+  @OneToMany(() => CourseTutor, (courseTutor) => courseTutor.course, {
+    cascade: true,
+  })
+  tutors: CourseTutor[];
 
   // One-to-Many with CourseFee
   @OneToMany(() => CourseFee, (courseFee) => courseFee.course, {

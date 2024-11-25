@@ -17,10 +17,14 @@ export enum PaymentStatus {
   SUCCESS = 'Success',
   FAILED = 'Failed',
   PENDING = 'Pending',
+  CANCELLED = 'Cancelled',
 }
 
 @Entity('payments')
 export class Payment extends BaseEntity {
+  @Column()
+  userId: string;
+
   @Column()
   orderId: string;
 
@@ -31,14 +35,10 @@ export class Payment extends BaseEntity {
   @Expose()
   amount: number;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  @Expose()
-  paymentDate: Date;
-
   @Column({
     type: 'enum',
     enum: PaymentMethod,
-    default: PaymentMethod.CREDIT_CARD,
+    default: PaymentMethod.BANK_TRANSFER,
   })
   @Expose()
   paymentMethod: PaymentMethod;
@@ -51,6 +51,17 @@ export class Payment extends BaseEntity {
   @Expose()
   status: PaymentStatus;
 
+  @Column({ nullable: true })
+  paymentLinkId: string;
+
+  @Column({ nullable: true })
+  checkoutUrl: string;
+
+  @Column({ nullable: true })
+  qrCode: string;
+
+  @Column({ nullable: true })
+  cancellationReason: string;
   // One-to-One with Order
   @OneToOne(() => Order, (order) => order.payment, {
     onDelete: 'CASCADE',

@@ -1,13 +1,6 @@
 // src/entities/user.entity.ts
 
-import {
-  Entity,
-  Column,
-  OneToOne,
-  OneToMany,
-  ManyToMany,
-  JoinTable,
-} from 'typeorm';
+import { Entity, Column, OneToOne, OneToMany } from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { Profile } from './profile.entity';
 import { Status } from './status.entity';
@@ -15,9 +8,9 @@ import { Review } from './review.entity';
 import { Payment } from './payment.entity';
 import { Membership } from './membership.entity';
 import { Schedule } from './schedule.entity';
-import { Course } from './course.entity';
 import { Order } from './order.entity';
 import { UserRole, UserStatus } from '@enums';
+import { CourseTutor } from '@entities';
 
 @Entity('users')
 export class User extends BaseEntity {
@@ -85,14 +78,11 @@ export class User extends BaseEntity {
   })
   schedules: Schedule[];
 
-  // Many-to-Many with Course as Tutor
-  @ManyToMany(() => Course, (course) => course.tutors)
-  @JoinTable({
-    name: 'course_tutors',
-    joinColumn: { name: 'tutor_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'course_id', referencedColumnName: 'id' },
+  // Many-to-Many with CourseTutor as Tutor
+  @OneToMany(() => CourseTutor, (courseTutor) => courseTutor.tutor, {
+    cascade: true,
   })
-  tutoringCourses: Course[];
+  tutoringCourses: CourseTutor[];
 
   // Many-to-Many with Course as Student via Order
   @OneToMany(() => Order, (order) => order.student)

@@ -1,6 +1,12 @@
 // src/entities/course-tutor.entity.ts
 
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Course } from './course.entity';
 import { User } from './user.entity';
 
@@ -18,10 +24,12 @@ export class CourseTutor {
   @ManyToOne(() => Course, (course) => course.tutors, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'course_id' })
   course: Course;
 
   @ManyToOne(() => User, (user) => user.tutoringCourses, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'tutor_id' })
   tutor: User;
 }

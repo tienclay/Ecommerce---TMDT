@@ -25,10 +25,6 @@ export class Order extends BaseEntity {
   @Column()
   courseFeeId: string;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  @Expose()
-  orderDate: Date;
-
   @Column({
     type: 'enum',
     enum: OrderStatus,

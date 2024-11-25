@@ -74,14 +74,19 @@ export class UserController {
   }
 
   @Get(':userId/courses')
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.TUTOR)
+  @UseGuards(AuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Get courses by user id' })
   @EcommerceApiResponse(CourseInfoDto, true)
   async getCoursesByUserId(
     @Param('userId') userId: string,
+    @CurrentUser() user: User,
   ): Promise<CourseInfoDto[]> {
+    if (user.role !== 'ADMIN' && user.id !== userId) {
+      throw new EcommerceForbiddenException(
+        'You are not allowed to access this resource',
+      );
+    }
     return this.userService.getCoursesByUserId(userId);
   }
 }
