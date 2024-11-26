@@ -6,10 +6,9 @@ dotenv.config({
 });
 
 export default registerAs<HttpModuleOptions>('pay-service', () => ({
-  baseURL: process.env.BASE_URL || 'http://localhost:3030',
+  baseURL: process.env.BASE_URL || 'http://localhost:3069',
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',
-    'x-api-key': process.env.X_API_KEY,
   },
 }));

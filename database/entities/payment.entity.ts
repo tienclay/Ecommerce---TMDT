@@ -28,6 +28,9 @@ export class Payment extends BaseEntity {
   @Column()
   orderId: string;
 
+  @Column({ unique: true })
+  orderCode: number;
+
   @Column({ nullable: true })
   membershipId: string;
 

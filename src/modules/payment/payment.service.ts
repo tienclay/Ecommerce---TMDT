@@ -1,12 +1,11 @@
 // src/services/payment.service.ts
 
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
-import * as crypto from 'crypto';
 import {
   Order,
   OrderStatus,
@@ -17,7 +16,6 @@ import {
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import {
   EcommerceBadRequestException,
-  EcommerceNotAcceptableException,
   EcommerceNotFoundException,
   InternalServerError,
 } from '@exceptions';
@@ -36,7 +34,56 @@ export class PaymentService {
     private configService: ConfigService,
     private httpService: HttpService,
   ) {}
+  private readonly MAX_RETRIES = 5;
+  private readonly RETRY_DELAY = 1000;
 
+  private generateOrderCode(): number {
+    return Math.floor(100000000 + Math.random() * 900000000);
+  }
+
+  private async sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+  private async createPaymentWithRetry(
+    order: Order,
+    returnUrl: string,
+    cancelUrl: string,
+    attempt = 1,
+  ): Promise<PaymentResponseDto> {
+    try {
+      const orderCode = this.generateOrderCode();
+
+      const payload: SendCreatePaymentDto = {
+        orderCode: Number(orderCode),
+        amount: Number(order.totalAmount),
+        description: `Order ${orderCode}`,
+        cancelUrl: cancelUrl || this.configService.get<string>('CANCEL_URL'),
+        returnUrl: returnUrl || this.configService.get<string>('RETURN_URL'),
+      };
+
+      const response = await firstValueFrom(
+        this.httpService.post(`/payments/create`, payload),
+      );
+
+      return response.data.data;
+    } catch (error) {
+      if (attempt >= this.MAX_RETRIES) {
+        throw new InternalServerError();
+      }
+
+      console.log(
+        `Payment creation failed, retrying with new order code. Attempt ${attempt + 1}`,
+      );
+      await this.sleep(this.RETRY_DELAY);
+
+      return this.createPaymentWithRetry(
+        order,
+        returnUrl,
+        cancelUrl,
+        attempt + 1,
+      );
+    }
+  }
   async createPayment(
     createPaymentDto: CreatePaymentDto,
   ): Promise<PaymentResponseDto> {
@@ -55,24 +102,12 @@ export class PaymentService {
         throw new EcommerceBadRequestException('Order has been completed');
       }
 
-      const payload: SendCreatePaymentDto = {
-        orderCode: Number(order.id),
-        amount: order.totalAmount,
-        description: `Thanh toán đơn hàng ${order.id}`,
-        cancelUrl: cancelUrl || this.configService.get<string>('CANCEL_URL'),
-        returnUrl: returnUrl || this.configService.get<string>('RETURN_URL'),
-      };
-
-      const response = await firstValueFrom(
-        this.httpService.post(`/payments/create`, payload),
-      );
-
-      const responseData: PaymentResponseDto = response.data;
-
+      const responseData: PaymentResponseDto =
+        await this.createPaymentWithRetry(order, returnUrl, cancelUrl);
       if (!responseData) {
         throw new InternalServerError();
       }
-
+      console.log('responseData.orderCode :>> ', responseData.orderCode);
       const responseInfo = await firstValueFrom(
         this.httpService.get(`/payments/${responseData.orderCode}`),
       );
@@ -91,6 +126,7 @@ export class PaymentService {
         checkoutUrl: responseData.checkoutUrl,
         qrCode: responseData.qrCode,
         cancellationReason: paymentInfo.cancellationReason,
+        orderCode: responseData.orderCode,
       };
 
       await this.createPaymentRecord(paymentDto);
@@ -99,6 +135,7 @@ export class PaymentService {
 
       return responseData;
     } catch (error) {
+      console.log('error.message :>> ', error.message);
       throw new InternalServerError();
     }
   }
@@ -113,130 +150,4 @@ export class PaymentService {
       throw new InternalServerError();
     }
   }
-
-  // Lấy thông tin thanh toán
-  // async getPaymentInfo(id: string | number) {
-  //   const headers = {
-  //     'x-client-id': this.clientId,
-  //     'x-api-key': this.apiKey,
-  //   };
-
-  //   try {
-  //     const response = await firstValueFrom(
-  //       this.httpService.get(`/v2/payment-requests/${id}`, {
-  //         headers,
-  //       }),
-  //     );
-
-  //     const responseData = response.data;
-
-  //     if (responseData.code !== '00') {
-  //       throw new HttpException(responseData.desc, HttpStatus.BAD_REQUEST);
-  //     }
-
-  //     return responseData.data;
-  //   } catch (error) {
-  //     const errorMessage =
-  //       error.response?.data?.desc || 'Không thể lấy thông tin thanh toán';
-  //     throw new HttpException(errorMessage, HttpStatus.BAD_REQUEST);
-  //   }
-  // }
-
-  // // Hủy link thanh toán
-  // async cancelPayment(
-  //   id: string,
-  //   cancellationReason?: string,
-  // ): Promise<PaymentLinkDto> {
-  //   const payload = {
-  //     cancellationReason,
-  //   };
-
-  //   const headers = {
-  //     'x-client-id': this.clientId,
-  //     'x-api-key': this.apiKey,
-  //   };
-
-  //   try {
-  //     const response = await firstValueFrom(
-  //       this.httpService.post(`/v2/payment-requests/${id}/cancel`, payload, {
-  //         headers,
-  //       }),
-  //     );
-
-  //     const responseData = response.data;
-
-  //     if (responseData.code !== '00') {
-  //       throw new HttpException(responseData.desc, HttpStatus.BAD_REQUEST);
-  //     }
-
-  //     // Cập nhật trạng thái thanh toán trong cơ sở dữ liệu
-  //     const payment = await this.paymentRepository.findOne({
-  //       where: [{ orderId: id }, { paymentLinkId: id }],
-  //     });
-  //     if (payment) {
-  //       payment.status = PaymentStatus.CANCELLED;
-  //       payment.cancellationReason = cancellationReason;
-  //       await this.paymentRepository.save(payment);
-  //     }
-
-  //     return {
-  //       message: 'Hủy link thanh toán thành công',
-  //     };
-  //   } catch (error) {
-  //     const errorMessage =
-  //       error.response?.data?.desc || 'Không thể hủy link thanh toán';
-  //     throw new HttpException(errorMessage, HttpStatus.BAD_REQUEST);
-  //   }
-  // }
-
-  // // Xác minh dữ liệu webhook
-  // verifyWebhookData(webhookData: any): boolean {
-  //   const signature = webhookData.signature;
-  //   const data = webhookData.data;
-
-  //   const signatureData = `amount=${data.amount}&description=${data.description}&orderCode=${data.orderCode}`;
-
-  //   const calculatedSignature = crypto
-  //     .createHmac('sha256', this.checksumKey)
-  //     .update(signatureData)
-  //     .digest('hex');
-
-  //   return calculatedSignature === signature;
-  // }
-
-  // // Xử lý dữ liệu webhook
-  // async handleWebhook(webhookData: any) {
-  //   const isValid = this.verifyWebhookData(webhookData);
-
-  //   if (!isValid) {
-  //     throw new HttpException('Chữ ký không hợp lệ', HttpStatus.BAD_REQUEST);
-  //   }
-
-  //   const data = webhookData.data;
-
-  //   // Cập nhật trạng thái thanh toán
-  //   const payment = await this.paymentRepository.findOne({
-  //     where: { orderId: data.orderCode },
-  //   });
-
-  //   if (payment) {
-  //     payment.status = PaymentStatus.SUCCESS;
-  //     await this.paymentRepository.save(payment);
-
-  //     // Cập nhật trạng thái đơn hàng
-  //     const order = await this.orderRepository.findOne({
-  //       where: { id: data.orderCode },
-  //     });
-
-  //     if (order) {
-  //       order.status = OrderStatus.COMPLETED;
-  //       await this.orderRepository.save(order);
-  //     }
-  //   }
-
-  //   return {
-  //     code: '00',
-  //     desc: 'Xử lý webhook thành công',
-  //   };
-  // }
 }

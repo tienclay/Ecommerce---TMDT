@@ -1,7 +1,14 @@
 // src/entities/order.entity.ts
 
 import { Expose } from 'class-transformer';
-import { Entity, Column, ManyToOne, OneToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  ManyToOne,
+  OneToOne,
+  JoinColumn,
+  BeforeInsert,
+} from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { User } from './user.entity';
 import { Course } from './course.entity';

@@ -4,6 +4,13 @@ import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class PaymentDto {
   @ApiProperty({
+    description: 'OrderCode',
+    example: '123456789101',
+  })
+  @IsNumber()
+  orderCode: number;
+
+  @ApiProperty({
     description: 'User ID associated with the payment',
     example: '12345-abcde',
   })

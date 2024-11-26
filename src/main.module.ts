@@ -24,7 +24,7 @@ const modules = [AuthModule, UserModule];
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: process.env.NODE_ENV === 'development' ? '.env' : '.env',
+      envFilePath: process.env.NODE_ENV === 'development' ? '.env.dev' : '.env',
       load: configurations,
       cache: true,
     }),

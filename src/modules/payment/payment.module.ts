@@ -6,7 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { HttpModule } from '@nestjs/axios';
 import { PayConfig } from '@config';
 import { ConfigType } from '@nestjs/config';
-
+import * as https from 'https';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Payment, Order, User]),
