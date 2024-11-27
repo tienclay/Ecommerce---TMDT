@@ -1,23 +1,30 @@
-# projectA/Dockerfile
-FROM node:18-alpine
+FROM node:lts as builder
 
-# Tạo thư mục app
-WORKDIR /app
+# Create app directory
+WORKDIR /usr/src/app
 
-# Sao chép package.json và yarn.lock
+# Install app dependencies
 COPY package.json yarn.lock ./
 
-# Cài đặt dependencies
-RUN yarn install --production
+RUN yarn install --frozen-lockfile
 
-# Sao chép mã nguồn
 COPY . .
 
-# Build project
 RUN yarn build
 
-# Expose port
-EXPOSE 3000
+FROM node:lts-slim
 
-# Chạy ứng dụng
-CMD ["yarn", "start:prod"]
+ENV NODE_ENV production
+USER node
+
+# Create app directory
+WORKDIR /usr/src/app
+
+# Install app dependencies
+COPY package.json yarn.lock ./
+
+RUN yarn install --production --frozen-lockfile
+
+COPY --from=builder /usr/src/app/dist ./dist
+
+CMD [ "node", "dist/main.js" ]
