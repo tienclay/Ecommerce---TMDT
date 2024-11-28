@@ -17,7 +17,7 @@ import { UserRole } from '@enums';
 import { AuthGuard, RolesGuard } from '@guards';
 import { CourseInfoDto } from './dto/course-info.dto';
 
-@Controller('ecommerce/courses')
+@Controller('courses')
 @ApiTags('Course')
 export class CourseController {
   constructor(private readonly courseService: CourseService) {}

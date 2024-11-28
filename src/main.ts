@@ -8,6 +8,8 @@ import { initializeTransactionalContext } from 'typeorm-transactional';
 async function bootstrap() {
   initializeTransactionalContext();
   const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix('ecommerce');
+
   const swaggerOption = new DocumentBuilder()
     .setTitle('Ecommerce API')
     .setDescription('Ecommerce API description')
@@ -32,7 +34,7 @@ async function bootstrap() {
   );
 
   const document = SwaggerModule.createDocument(app, swaggerOption);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('ecommerce/api', app, document);
 
   app.enableCors({
     allowedHeaders: '*',

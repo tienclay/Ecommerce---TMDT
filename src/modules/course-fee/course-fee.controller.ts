@@ -19,7 +19,7 @@ import { plainToClass } from 'class-transformer';
 import { CourseFeeDto } from './dto/course-fee-info.dto';
 
 @ApiTags('CourseFees')
-@Controller('ecommerce/course-fees')
+@Controller('course-fees')
 export class CourseFeeController {
   constructor(private readonly courseFeeService: CourseFeeService) {}
 

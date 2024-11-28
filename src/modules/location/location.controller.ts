@@ -17,7 +17,7 @@ import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Roles } from '@decorators';
 import { LocationInfoDto } from './dto/location-info.dto';
 @ApiTags('Location')
-@Controller('ecommerce/locations')
+@Controller('locations')
 export class LocationController {
   constructor(private readonly locationService: LocationService) {}
 

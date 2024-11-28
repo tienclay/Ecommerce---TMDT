@@ -22,7 +22,7 @@ import { GenerateTokenInfoDto } from './dto/generate-token-info.dto';
 import { TokenGuard } from '@guards';
 
 @ApiTags('Auth')
-@Controller('ecommerce/auth')
+@Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 

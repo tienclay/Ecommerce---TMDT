@@ -48,3 +48,5 @@ jobs:
             cd TMDT
             docker compose pull ecommerce
             docker compose up -d --no-deps ecommerce
+            docker image prune -f
+            docker system prune -af

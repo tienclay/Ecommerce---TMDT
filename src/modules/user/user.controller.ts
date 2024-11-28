@@ -14,7 +14,7 @@ import { UserInfoDto } from './dto/user-info.dto';
 import { UserRole } from '@enums';
 import { ProfileId } from './dto/profile-id.dto';
 import { CourseInfoDto } from '../course/dto/course-info.dto';
-@Controller('ecommerce/users')
+@Controller('users')
 @ApiTags('User')
 export class UserController {
   constructor(private readonly userService: UserService) {}
