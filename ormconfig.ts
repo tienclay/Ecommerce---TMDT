@@ -1,7 +1,12 @@
 import { MainSeeder } from 'database/seeds/main.seed';
 import { NamingStrategy } from 'database/typeorm';
+import * as dotenv from 'dotenv';
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { SeederOptions } from 'typeorm-extension';
+
+dotenv.config({
+  path: '.env',
+});
 
 const options: DataSourceOptions & SeederOptions = {
   type: 'postgres',

@@ -12,7 +12,7 @@ import { CreateScheduleDto } from './dto/create-schedule.dto';
 import { UpdateScheduleDto } from './dto/update-schedule.dto';
 import { ApiTags } from '@nestjs/swagger';
 
-@Controller('schedule')
+@Controller('ecommerce/schedule')
 @ApiTags('Schedule')
 export class ScheduleController {
   constructor(private readonly scheduleService: ScheduleService) {}

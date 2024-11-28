@@ -18,7 +18,7 @@ import { PaymentResponseDto } from './dto/payment-response.dto';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { PaymentLinkDto } from './dto/payment-link.dto';
 
-@Controller('payments')
+@Controller('ecommerce/payments')
 @ApiTags('Payment')
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}

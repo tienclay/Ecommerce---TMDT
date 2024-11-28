@@ -46,5 +46,5 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             cd TMDT
-            docker compose pull Ecommerce---TMDT
-            docker compose up -d --no-deps Ecommerce---TMDT
+            docker compose pull ecommerce
+            docker compose up -d --no-deps ecommerce

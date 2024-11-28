@@ -23,7 +23,7 @@ import { ProfileInfoDto } from './dto/profile-info.dto';
 import { CurrentUser } from '@decorators';
 import { EcommerceForbiddenException } from '@exceptions';
 
-@Controller('profiles')
+@Controller('ecommerce/profiles')
 @ApiTags('Profile')
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}

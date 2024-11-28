@@ -8,7 +8,6 @@ import { initializeTransactionalContext } from 'typeorm-transactional';
 async function bootstrap() {
   initializeTransactionalContext();
   const app = await NestFactory.create(AppModule);
-
   const swaggerOption = new DocumentBuilder()
     .setTitle('Ecommerce API')
     .setDescription('Ecommerce API description')

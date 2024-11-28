@@ -19,7 +19,7 @@ import { OrderDto } from './dto/order.dto';
 import { Order } from '@entities';
 
 @ApiTags('Orders')
-@Controller('orders')
+@Controller('ecommerce/orders')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
