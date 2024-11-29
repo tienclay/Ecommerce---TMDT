@@ -1,4 +1,12 @@
-import { Controller, Delete, Get, Param, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import {
   ApiBearerAuth,
@@ -14,6 +22,12 @@ import { UserInfoDto } from './dto/user-info.dto';
 import { UserRole } from '@enums';
 import { ProfileId } from './dto/profile-id.dto';
 import { CourseInfoDto } from '../course/dto/course-info.dto';
+import { ReviewDto } from '../review/dto/review.dto';
+import {
+  CreateStatusDto,
+  LikeStatusDto,
+  StatusResponseDto,
+} from './dto/status-like.dto';
 @Controller('users')
 @ApiTags('User')
 export class UserController {
@@ -88,5 +102,63 @@ export class UserController {
       );
     }
     return this.userService.getCoursesByUserId(userId);
+  }
+
+  @Get(':userId/reviews')
+  @ApiOperation({ summary: 'Get reviews by user id' })
+  @EcommerceApiResponse(ReviewDto, true)
+  async getReviewsByUserId(
+    @Param('userId') userId: string,
+  ): Promise<ReviewDto[]> {
+    return this.userService.getReviewsByUserId(userId);
+  }
+
+  @Post('status')
+  @ApiBearerAuth('access-token')
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Create a new status' })
+  createStatus(
+    @Body() createStatusDto: CreateStatusDto,
+    @CurrentUser() user: User,
+  ): Promise<StatusResponseDto> {
+    createStatusDto.userId = user.id;
+    return this.userService.createStatus(createStatusDto);
+  }
+
+  @Get(':userId/statuses')
+  @ApiOperation({ summary: 'Get statuses of a user' })
+  findAllStatusesByUser(
+    @Param('userId') userId: string,
+  ): Promise<StatusResponseDto[]> {
+    return this.userService.findAllStatusesByUser(userId);
+  }
+
+  @Post('likes/:statusId')
+  @ApiBearerAuth('access-token')
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Like a status' })
+  likeStatus(
+    @Param('statusId') statusId: string,
+    @CurrentUser() user: User,
+  ): Promise<void> {
+    const likeStatusDto: LikeStatusDto = {
+      statusId,
+      userId: user.id,
+    };
+    return this.userService.likeStatus(likeStatusDto);
+  }
+  @Post('unlikes/:statusId')
+  @ApiBearerAuth('access-token')
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Unlike a status' })
+  unlikeStatus(
+    @Param('statusId') statusId: string,
+    @CurrentUser() user: User,
+  ): Promise<void> {
+    const likeStatusDto: LikeStatusDto = {
+      statusId,
+      userId: user.id,
+    };
+    return this.userService.unlikeStatus(likeStatusDto);
   }
 }

@@ -11,11 +11,17 @@ import {
 import { CourseService } from './course.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Roles } from '@decorators';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { CurrentUser, Roles } from '@decorators';
 import { UserRole } from '@enums';
 import { AuthGuard, RolesGuard } from '@guards';
 import { CourseInfoDto } from './dto/course-info.dto';
+import { ReviewDto } from '../review/dto/review.dto';
 
 @Controller('courses')
 @ApiTags('Course')
@@ -88,5 +94,20 @@ export class CourseController {
     @Body() assignTutorDto: string[],
   ): Promise<string> {
     return this.courseService.assignTutorToCourse(courseId, assignTutorDto);
+  }
+
+  // API: Lấy tất cả Review của một khóa học
+  @Get(':courseId/reviews')
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get reviews by course id' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of reviews for the course',
+    type: [ReviewDto],
+  })
+  async getCourseReviews(
+    @Param('courseId') courseId: string,
+  ): Promise<ReviewDto[]> {
+    return this.courseService.getReviewsForCourse(courseId);
   }
 }

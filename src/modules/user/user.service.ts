@@ -1,15 +1,32 @@
-import { EcommerceBadRequestException } from './../../common/infra-exception/exception';
+import {
+  EcommerceBadRequestException,
+  EcommerceNotAcceptableException,
+} from '@exceptions';
 import { plainToClass } from 'class-transformer';
-import { Course, CourseTutor, Order, Profile, User } from '@entities';
-import { Inject, Injectable } from '@nestjs/common';
-import { In, Repository } from 'typeorm';
+import {
+  Course,
+  CourseTutor,
+  Like,
+  Order,
+  Profile,
+  Review,
+  Status,
+  User,
+} from '@entities';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Repository } from 'typeorm';
 import { UserInfoDto } from './dto/user-info.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EcommerceNotFoundException } from '@exceptions';
-import { ProfileInfoDto } from '../profile/dto/profile-info.dto';
 import { ProfileId } from './dto/profile-id.dto';
 import { UserRole, UserStatus } from '@enums';
 import { CourseInfoDto } from '../course/dto/course-info.dto';
+import { ReviewDto } from '../review/dto/review.dto';
+import {
+  CreateStatusDto,
+  LikeStatusDto,
+  StatusResponseDto,
+} from './dto/status-like.dto';
 
 @Injectable()
 export class UserService {
@@ -22,7 +39,16 @@ export class UserService {
     private courseTutorRepository: Repository<CourseTutor>,
     @InjectRepository(Order)
     private orderRepository: Repository<Order>,
+    @InjectRepository(Review)
+    private reviewRepository: Repository<Review>,
+    @InjectRepository(Like)
+    private likeRepository: Repository<Like>,
+    @InjectRepository(Course)
+    private courseRepository: Repository<Course>,
+    @InjectRepository(Status)
+    private statusRepository: Repository<Status>,
   ) {}
+  private readonly logger = new Logger(UserService.name);
   async findUserById(userId: string): Promise<UserInfoDto> {
     try {
       const user = await this.userRepository.findOneByOrFail({ id: userId });
@@ -98,6 +124,156 @@ export class UserService {
       throw new EcommerceBadRequestException(
         `Failed to get courses: ${error.message}`,
       );
+    }
+  }
+  async getReviewsByUserId(userId: string): Promise<ReviewDto[]> {
+    try {
+      const user: User = await this.userRepository.findOne({
+        where: { id: userId },
+      });
+      if (!user) {
+        throw new EcommerceNotFoundException('User not found');
+      }
+      if (user.role == UserRole.ADMIN) {
+        throw new EcommerceBadRequestException(
+          'You are not allowed to access this resource',
+        );
+      }
+      if (user.role == UserRole.STUDENT) {
+        const reviews = await this.reviewRepository.find({
+          where: { studentId: userId },
+        });
+        return reviews.map((review) => plainToClass(ReviewDto, review));
+      }
+      const reviews = await this.reviewRepository.find({
+        where: { tutorId: userId },
+      });
+      return reviews.map((review) => plainToClass(ReviewDto, review));
+    } catch (error) {
+      this.logger.error(error);
+      throw new EcommerceBadRequestException(
+        `Failed to get reviews: ${error.message}`,
+      );
+    }
+  }
+  async createStatus(
+    createStatusDto: CreateStatusDto,
+  ): Promise<StatusResponseDto> {
+    try {
+      const status = this.statusRepository.create(createStatusDto);
+      await this.statusRepository.save(status);
+      await this.updateAncestorRepliesCounts(status.parentStatusId);
+      return plainToClass(StatusResponseDto, status);
+    } catch (error) {
+      this.logger.error(error);
+      throw new EcommerceBadRequestException(
+        `Failed to create status: ${error.message}`,
+      );
+    }
+  }
+
+  async findAllStatusesByUser(userId: string): Promise<StatusResponseDto[]> {
+    try {
+      const statuses = await this.statusRepository.find({
+        where: { userId: userId },
+      });
+      return statuses.map((status) => plainToClass(StatusResponseDto, status));
+    } catch (error) {
+      this.logger.error(error);
+      throw new EcommerceBadRequestException(
+        `Failed to get statuses: ${error.message}`,
+      );
+    }
+  }
+
+  private async updateAncestorRepliesCounts(
+    statusId: string | null,
+    delta: number = 1,
+  ) {
+    if (!statusId) {
+      return;
+    }
+
+    try {
+      const parentStatus = await this.statusRepository.findOne({
+        where: { id: statusId },
+        relations: ['parentStatus'],
+      });
+
+      if (parentStatus) {
+        // Update current parent's count
+        parentStatus.repliesCount += delta;
+        await this.statusRepository.save(parentStatus);
+
+        // Recursively update ancestor counts
+        if (parentStatus.parentStatusId) {
+          await this.updateAncestorRepliesCounts(parentStatus.parentStatusId);
+        }
+      }
+    } catch (error) {
+      throw new EcommerceNotAcceptableException(
+        `Failed to update ancestor replies counts: ${error.message}`,
+      );
+    }
+  }
+
+  async likeStatus(likeStatusDto: LikeStatusDto): Promise<void> {
+    try {
+      const existingLike = await this.likeRepository.findOne({
+        where: likeStatusDto,
+      });
+      if (existingLike) {
+        throw new EcommerceBadRequestException('You have already liked this');
+      }
+      const like = this.likeRepository.create(likeStatusDto);
+      await Promise.all([
+        this.likeRepository.save(like),
+        this.updateLikesCount(likeStatusDto.statusId),
+      ]);
+    } catch (error) {
+      this.logger.error(error);
+      throw new EcommerceBadRequestException(
+        `Failed to like status: ${error.message}`,
+      );
+    }
+  }
+
+  async unlikeStatus(likeStatusDto: LikeStatusDto): Promise<void> {
+    try {
+      const existingLike = await this.likeRepository.findOne({
+        where: likeStatusDto,
+      });
+      if (!existingLike) {
+        throw new EcommerceBadRequestException('You have not liked this');
+      }
+      await Promise.all([
+        this.likeRepository.remove(existingLike),
+        this.updateLikesCountOnDelete(likeStatusDto.statusId),
+      ]);
+    } catch (error) {
+      this.logger.error(error);
+      throw new EcommerceBadRequestException(
+        `Failed to unlike status: ${error.message}`,
+      );
+    }
+  }
+
+  async updateLikesCount(statusId: string) {
+    const status = await this.statusRepository.findOne({
+      where: { id: statusId },
+    });
+    if (status) {
+      status.likesCount += 1;
+      await this.statusRepository.save(status);
+    }
+  }
+  async updateLikesCountOnDelete(statusId: string) {
+    const status = await this.statusRepository.findOne({
+      where: { id: statusId },
+    });
+    if (status) {
+      status.likesCount -= 1;
+      await this.statusRepository.save(status);
     }
   }
 }

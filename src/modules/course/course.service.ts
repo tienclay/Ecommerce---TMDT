@@ -1,6 +1,6 @@
 import { EcommerceBadRequestException } from './../../common/infra-exception/exception';
 import { connectionSource } from './../../../ormconfig';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -11,6 +11,7 @@ import { plainToClass } from 'class-transformer';
 import { EcommerceNotFoundException } from '@exceptions';
 import { CourseTutorInfoDto } from './dto/course-tutor-info.dto';
 import { UserRole } from '@enums';
+import { ReviewDto } from '../review/dto/review.dto';
 
 @Injectable()
 export class CourseService {
@@ -23,6 +24,7 @@ export class CourseService {
     private userRepository: Repository<User>,
     private readonly connection: Connection,
   ) {}
+  private readonly logger = new Logger(CourseService.name);
   async create(createCourseDto: CreateCourseDto): Promise<CourseInfoDto> {
     try {
       // Create course with proper typing
@@ -135,6 +137,22 @@ export class CourseService {
       );
     } finally {
       await queryRunner.release();
+    }
+  }
+
+  async getReviewsForCourse(courseId: string): Promise<ReviewDto[]> {
+    try {
+      const course = await this.courseRepository.findOne({
+        where: { id: courseId },
+        relations: ['reviews'],
+      });
+      if (!course) {
+        throw new EcommerceNotFoundException('Course not found');
+      }
+      return course.reviews.map((review) => plainToClass(ReviewDto, review));
+    } catch (error) {
+      this.logger.error(error);
+      throw error;
     }
   }
 }
