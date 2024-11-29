@@ -7,6 +7,7 @@ import { CourseFee } from './course-fee.entity';
 import { Location } from './location.entity';
 import { Order } from './order.entity';
 import { CourseTutor } from './course-tutor.entity';
+import { Review } from '@entities';
 
 @Entity('courses')
 export class Course extends BaseEntity {
@@ -50,4 +51,7 @@ export class Course extends BaseEntity {
     cascade: true,
   })
   orders: Order[];
+
+  @OneToMany(() => Review, (review) => review.course)
+  reviews: Review[]; // Add One-to-Many relationship with Review
 }

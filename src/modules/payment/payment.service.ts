@@ -118,6 +118,7 @@ export class PaymentService {
       if (!responseData) {
         throw new EcommerceBadRequestException('Payment creation failed');
       }
+      console.log('object :>> ', responseData.orderCode);
       const responseInfo = await firstValueFrom(
         this.httpService.get(`/payments/${responseData.orderCode}`),
       );

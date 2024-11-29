@@ -1,9 +1,17 @@
 // src/entities/like.entity.ts
 
-import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  AfterInsert,
+  BeforeRemove,
+} from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { User } from './user.entity';
 import { Status } from './status.entity';
+import { connectionSource } from 'ormconfig';
 
 @Entity('likes')
 export class Like extends BaseEntity {

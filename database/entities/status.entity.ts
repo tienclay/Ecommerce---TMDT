@@ -1,10 +1,18 @@
-// src/entities/status.entity.ts
-
 import { Expose } from 'class-transformer';
-import { Entity, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+  AfterInsert,
+  BeforeRemove,
+} from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { User } from './user.entity';
 import { Like } from './like.entity';
+import { connectionSource } from 'ormconfig';
+import { EcommerceNotAcceptableException } from '@exceptions';
 
 @Entity('statuses')
 export class Status extends BaseEntity {
@@ -21,6 +29,10 @@ export class Status extends BaseEntity {
   @Column({ default: 0 })
   @Expose()
   likesCount: number;
+
+  @Column({ default: 0 })
+  @Expose()
+  repliesCount: number; // Add repliesCount column
 
   // Many-to-One with User
   @ManyToOne(() => User, (user) => user.statuses, {
