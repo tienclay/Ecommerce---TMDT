@@ -34,7 +34,6 @@ export class CourseController {
   async create(
     @Body() createCourseDto: CreateCourseDto,
   ): Promise<CourseInfoDto> {
-    console.log('createCourseDto :>> ', createCourseDto);
     return this.courseService.create(createCourseDto);
   }
 

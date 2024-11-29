@@ -59,9 +59,8 @@ export class PaymentDto {
     description: 'Payment link ID for external payment systems',
     example: 'payment-link-123',
   })
-  @IsOptional()
   @IsString()
-  paymentLinkId?: string;
+  paymentLinkId: string;
 
   @ApiPropertyOptional({
     description: 'Checkout URL for the payment',

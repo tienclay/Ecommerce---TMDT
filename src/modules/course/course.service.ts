@@ -26,7 +26,6 @@ export class CourseService {
   async create(createCourseDto: CreateCourseDto): Promise<CourseInfoDto> {
     try {
       // Create course with proper typing
-      console.log('createCourseDto :>> ', createCourseDto);
       const course = this.courseRepository.create(createCourseDto);
       const saveCourse = await this.courseRepository.save(course);
       return plainToClass(CourseInfoDto, saveCourse);

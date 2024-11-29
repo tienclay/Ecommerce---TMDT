@@ -19,6 +19,7 @@ export enum OrderStatus {
   PENDING = 'Pending',
   COMPLETED = 'Completed',
   CANCELLED = 'Cancelled',
+  PROCESSING = 'Processing',
 }
 
 @Entity('orders')

@@ -1,6 +1,7 @@
+import { plainToClass } from 'class-transformer';
 // src/services/payment.service.ts
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
@@ -23,6 +24,9 @@ import { SendCreatePaymentDto } from './dto/send-create-payment.dto';
 import { PaymentResponseDto } from './dto/payment-response.dto';
 import { PaymentLinkDto } from './dto/payment-link.dto';
 import { PaymentDto } from './dto/payment.dto';
+import { ConfirmWebhookDto } from './dto/confirm-webhook.dto';
+import { WebhookResponse } from './dto/webhook-data.dto';
+import { CancelPaymentDto } from './dto/cancel.dto';
 
 @Injectable()
 export class PaymentService {
@@ -34,6 +38,8 @@ export class PaymentService {
     private configService: ConfigService,
     private httpService: HttpService,
   ) {}
+  private readonly logger = new Logger(PaymentService.name);
+
   private readonly MAX_RETRIES = 5;
   private readonly RETRY_DELAY = 1000;
 
@@ -67,13 +73,11 @@ export class PaymentService {
 
       return response.data.data;
     } catch (error) {
+      this.logger.error(error);
       if (attempt >= this.MAX_RETRIES) {
-        throw new InternalServerError();
+        throw new EcommerceBadRequestException('Payment creation failed');
       }
 
-      console.log(
-        `Payment creation failed, retrying with new order code. Attempt ${attempt + 1}`,
-      );
       await this.sleep(this.RETRY_DELAY);
 
       return this.createPaymentWithRetry(
@@ -93,7 +97,6 @@ export class PaymentService {
         where: { id: orderId },
         relations: ['student'],
       });
-
       if (!order) {
         throw new EcommerceNotFoundException('Order not found');
       }
@@ -102,20 +105,26 @@ export class PaymentService {
         throw new EcommerceBadRequestException('Order has been completed');
       }
 
+      if (order.status === OrderStatus.CANCELLED) {
+        throw new EcommerceBadRequestException('Order has been cancelled');
+      }
+
+      if (order.status === OrderStatus.PROCESSING) {
+        throw new EcommerceBadRequestException('Order is processing');
+      }
+
       const responseData: PaymentResponseDto =
         await this.createPaymentWithRetry(order, returnUrl, cancelUrl);
       if (!responseData) {
-        throw new InternalServerError();
+        throw new EcommerceBadRequestException('Payment creation failed');
       }
-      console.log('responseData.orderCode :>> ', responseData.orderCode);
       const responseInfo = await firstValueFrom(
         this.httpService.get(`/payments/${responseData.orderCode}`),
       );
       if (!responseInfo) {
-        throw new InternalServerError();
+        throw new EcommerceBadRequestException('Not found payment info');
       }
-      const paymentInfo: PaymentLinkDto = responseInfo.data;
-
+      const paymentInfo: PaymentLinkDto = responseInfo.data.data;
       const paymentDto: PaymentDto = {
         userId: order.student.id,
         orderId: order.id,
@@ -131,12 +140,14 @@ export class PaymentService {
 
       await this.createPaymentRecord(paymentDto);
 
-      // Lưu thông tin Payment vào cơ sở dữ liệu
+      //change order status to processing
+      order.status = OrderStatus.PROCESSING;
+      await this.orderRepository.save(order);
 
-      return responseData;
+      return plainToClass(PaymentResponseDto, responseData);
     } catch (error) {
-      console.log('error.message :>> ', error.message);
-      throw new InternalServerError();
+      this.logger.error(error);
+      throw error;
     }
   }
 
@@ -147,6 +158,99 @@ export class PaymentService {
       const payment = this.paymentRepository.create(createPaymentRecordDto);
       return await this.paymentRepository.save(payment);
     } catch (error) {
+      this.logger.error(error);
+      throw new EcommerceBadRequestException('Create payment record failed');
+    }
+  }
+
+  async getPaymentInfo(orderId: string): Promise<PaymentLinkDto> {
+    try {
+      const payment = await this.paymentRepository.findOne({
+        where: { orderId },
+      });
+      if (!payment) {
+        throw new EcommerceNotFoundException('Payment not found');
+      }
+      const orderCode = payment.orderCode;
+      const response = await firstValueFrom(
+        this.httpService.get(`/payments/${orderCode}`),
+      );
+      return plainToClass(PaymentLinkDto, response.data.data);
+    } catch (error) {
+      this.logger.error(error);
+      throw new EcommerceBadRequestException('Get payment info failed');
+    }
+  }
+
+  async cancelPayment(
+    orderId: string,
+    cancellationReason: CancelPaymentDto,
+  ): Promise<PaymentLinkDto> {
+    try {
+      const payment = await this.paymentRepository.findOne({
+        where: { orderId },
+      });
+
+      if (!payment) {
+        throw new EcommerceNotFoundException('Payment not found');
+      }
+
+      const orderCode = payment.orderCode;
+      const response = await firstValueFrom(
+        this.httpService.put(`/payments/${orderCode}`, cancellationReason),
+      );
+
+      payment.status = PaymentStatus.CANCELLED;
+      payment.cancellationReason = cancellationReason.cancellationReason;
+      await this.paymentRepository.save(payment);
+      const order = await this.orderRepository.findOne({
+        where: { id: orderId },
+      });
+      order.status = OrderStatus.CANCELLED;
+      await this.orderRepository.save(order);
+
+      return plainToClass(PaymentLinkDto, response.data.data);
+    } catch (error) {
+      this.logger.error(error);
+      throw new EcommerceBadRequestException('Cancel payment failed');
+    }
+  }
+
+  async handleWebhook(webhookData: WebhookResponse): Promise<void> {
+    try {
+      const data = webhookData.data;
+      if (data.desc != 'success') {
+        return;
+      }
+      const payment = await this.paymentRepository.findOne({
+        where: { paymentLinkId: data.paymentLinkId },
+      });
+      if (!payment) {
+        return;
+      }
+      if (payment.amount != data.amount) {
+        return;
+      }
+      payment.status = PaymentStatus.SUCCESS;
+      this.paymentRepository.save(payment);
+      const order = await this.orderRepository.findOne({
+        where: { id: payment.orderId },
+      });
+      order.status = OrderStatus.COMPLETED;
+      this.orderRepository.save(order);
+    } catch (error) {
+      this.logger.error(error);
+      throw new EcommerceBadRequestException('Handle webhook failed');
+    }
+  }
+
+  async confirmWebhook(confirmWebhookDto: ConfirmWebhookDto): Promise<void> {
+    try {
+      await firstValueFrom(
+        this.httpService.post('/payments/confirm-webhook', confirmWebhookDto),
+      );
+    } catch (error) {
+      this.logger.error(error);
       throw new InternalServerError();
     }
   }

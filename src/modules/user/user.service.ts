@@ -88,7 +88,6 @@ export class UserService {
           where: { tutorId: userId },
           relations: ['course'],
         });
-        console.log('courseTutors :>> ', courseTutors);
         courses = courseTutors.map((ct) => ct.course);
       }
 
