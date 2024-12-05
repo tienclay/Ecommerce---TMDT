@@ -8,6 +8,7 @@ import { Location } from './location.entity';
 import { Order } from './order.entity';
 import { CourseTutor } from './course-tutor.entity';
 import { Review } from '@entities';
+import { WeeklyPlan } from './weeklyplan.entity';
 
 @Entity('courses')
 export class Course extends BaseEntity {
@@ -22,6 +23,14 @@ export class Course extends BaseEntity {
   @Column()
   @Expose()
   duration: string; // e.g., "10 weeks"
+
+  @Column({ type: 'date', nullable: true })
+  @Expose()
+  startDate: Date;
+
+  @Column({ type: 'date', nullable: true })
+  @Expose()
+  endDate: Date;
 
   @Column({ type: 'uuid' })
   locationId: string;
@@ -54,4 +63,7 @@ export class Course extends BaseEntity {
 
   @OneToMany(() => Review, (review) => review.course)
   reviews: Review[]; // Add One-to-Many relationship with Review
+
+  @OneToMany(() => WeeklyPlan, (weeklyPlan) => weeklyPlan.course)
+  weeklyPlans: WeeklyPlan[];
 }

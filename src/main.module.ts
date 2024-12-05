@@ -55,10 +55,10 @@ const modules = [AuthModule, UserModule];
         return config as WinstonModuleOptions;
       },
     }),
-    RedisModule.forRoot({
-      type: 'single',
-      url: process.env.REDIS_URL,
-    }),
+    // RedisModule.forRoot({
+    //   type: 'single',
+    //   url: process.env.REDIS_URL,
+    // }),
     ...modules,
     UserModule,
     ProfileModule,

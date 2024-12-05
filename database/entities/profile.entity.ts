@@ -6,6 +6,11 @@ import { BaseEntity } from './base.entity';
 import { User } from './user.entity';
 import { PhoneCode } from '@enums';
 
+export enum DegreeType {
+  BACHELOR = 'Bachelor',
+  MASTER = 'Master',
+  PHD = 'PhD',
+}
 @Entity('profiles')
 export class Profile extends BaseEntity {
   @Column({ type: 'varchar', nullable: true })
@@ -16,6 +21,12 @@ export class Profile extends BaseEntity {
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   lastName?: string;
+
+  @Column({ type: 'enum', enum: DegreeType, nullable: true })
+  degree?: DegreeType;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  experienceYears?: number;
 
   @Column({ type: 'text', nullable: true })
   @Expose()

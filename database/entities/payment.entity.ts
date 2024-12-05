@@ -25,14 +25,14 @@ export class Payment extends BaseEntity {
   @Column()
   userId: string;
 
-  @Column()
-  orderId: string;
+  @Column({ nullable: true })
+  orderId?: string;
 
   @Column({ unique: true })
   orderCode: number;
 
   @Column({ nullable: true })
-  membershipId: string;
+  membershipId?: string;
 
   @Column('decimal', { precision: 10, scale: 2 })
   @Expose()
