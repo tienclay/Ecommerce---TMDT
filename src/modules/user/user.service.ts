@@ -276,4 +276,13 @@ export class UserService {
       await this.statusRepository.save(status);
     }
   }
+
+  async findAll(): Promise<User[]> {
+    try {
+      //ignore password
+      return this.userRepository.find({ select: ['id', 'email', 'role'] });
+    } catch (error) {
+      throw new EcommerceBadRequestException(error.message);
+    }
+  }
 }

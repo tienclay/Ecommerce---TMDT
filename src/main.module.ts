@@ -18,6 +18,7 @@ import { ScheduleModule } from './modules/schedule/schedule.module';
 import { PaymentModule } from './modules/payment/payment.module';
 import { OrderModule } from './modules/order/order.module';
 import { ReviewModule } from './modules/review/review.module';
+import { WeeklyPlanModule } from './modules/weekly-plan/weekly-plan.module';
 
 const modules = [AuthModule, UserModule];
 
@@ -69,6 +70,7 @@ const modules = [AuthModule, UserModule];
     PaymentModule,
     OrderModule,
     ReviewModule,
+    WeeklyPlanModule,
   ],
   providers: [
     {
