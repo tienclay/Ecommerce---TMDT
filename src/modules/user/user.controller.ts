@@ -161,4 +161,18 @@ export class UserController {
     };
     return this.userService.unlikeStatus(likeStatusDto);
   }
+
+  //get all users
+  @Get()
+  @ApiOperation({
+    summary: 'Get all users',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'List of users',
+    type: [UserInfoDto],
+  })
+  async findAll(): Promise<UserInfoDto[]> {
+    return this.userService.findAll();
+  }
 }
