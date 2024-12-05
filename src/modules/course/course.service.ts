@@ -4,7 +4,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Course, CourseTutor, Order, User } from '@entities';
+import { Course, CourseTutor, Order, User, WeeklyPlan } from '@entities';
 import { DeepPartial, Repository, Connection, In } from 'typeorm';
 import { CourseInfoDto } from './dto/course-info.dto';
 import { plainToClass } from 'class-transformer';
@@ -157,6 +157,21 @@ export class CourseService {
         throw new EcommerceNotFoundException('Course not found');
       }
       return course.reviews.map((review) => plainToClass(ReviewDto, review));
+    } catch (error) {
+      this.logger.error(error);
+      throw error;
+    }
+  }
+  async getWeeklyPlansForCourse(courseId: string): Promise<WeeklyPlan[]> {
+    try {
+      const course = await this.courseRepository.findOne({
+        where: { id: courseId },
+        relations: ['weeklyPlans'],
+      });
+      if (!course) {
+        throw new EcommerceNotFoundException('Course not found');
+      }
+      return course.weeklyPlans;
     } catch (error) {
       this.logger.error(error);
       throw error;

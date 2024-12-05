@@ -8,6 +8,7 @@ import {
   CourseTutor,
   Like,
   Order,
+  Payment,
   Profile,
   Review,
   Status,
@@ -47,6 +48,8 @@ export class UserService {
     private courseRepository: Repository<Course>,
     @InjectRepository(Status)
     private statusRepository: Repository<Status>,
+    @InjectRepository(Payment)
+    private paymentRepository: Repository<Payment>,
   ) {}
   private readonly logger = new Logger(UserService.name);
   async findUserById(userId: string): Promise<UserInfoDto> {
@@ -281,6 +284,22 @@ export class UserService {
     try {
       //ignore password
       return this.userRepository.find({ select: ['id', 'email', 'role'] });
+    } catch (error) {
+      throw new EcommerceBadRequestException(error.message);
+    }
+  }
+
+  async getOrdersByUserId(userId: string): Promise<Order[]> {
+    try {
+      return this.orderRepository.find({ where: { studentId: userId } });
+    } catch (error) {
+      throw new EcommerceBadRequestException(error.message);
+    }
+  }
+
+  async getPaymentsByUserId(userId: string): Promise<Payment[]> {
+    try {
+      return this.paymentRepository.find({ where: { userId } });
     } catch (error) {
       throw new EcommerceBadRequestException(error.message);
     }

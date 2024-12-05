@@ -11,6 +11,7 @@ import {
   User,
   Like,
   Status,
+  Payment,
 } from '@entities';
 
 @Module({
@@ -24,6 +25,7 @@ import {
       Review,
       Like,
       Status,
+      Payment,
     ]),
   ],
   controllers: [UserController],
