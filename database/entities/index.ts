@@ -11,3 +11,4 @@ export * from './profile.entity';
 export * from './course-tutor.entity';
 export * from './like.entity';
 export * from './membership.entity';
+export * from './weeklyplan.entity';

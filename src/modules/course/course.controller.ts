@@ -44,7 +44,13 @@ export class CourseController {
   }
 
   @Get()
-  findAll() {
+  @ApiOperation({ summary: 'Get all courses' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of courses',
+    type: [CourseInfoDto],
+  })
+  async findAll(): Promise<CourseInfoDto[]> {
     return this.courseService.findAll();
   }
 

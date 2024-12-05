@@ -1,13 +1,13 @@
 import {
   IsString,
   IsOptional,
-  IsEmail,
   IsEnum,
   IsDateString,
   Length,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { PhoneCode } from '@enums';
+import { DegreeType } from '@entities';
 
 export class CreateProfileDto {
   @ApiPropertyOptional({ type: String, description: 'Avatar URL of the user' })
@@ -34,6 +34,19 @@ export class CreateProfileDto {
   @IsString()
   @Length(1, 255)
   lastName?: string;
+
+  @ApiPropertyOptional({
+    enum: DegreeType,
+    description: 'Degree of the user',
+  })
+  degree?: DegreeType;
+
+  @ApiPropertyOptional({
+    type: Number,
+    description: 'Years of experience of the user',
+    example: 5,
+  })
+  experienceYears?: number;
 
   @ApiProperty({
     type: String,

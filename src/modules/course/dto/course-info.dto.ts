@@ -34,6 +34,20 @@ export class CourseInfoDto {
   duration: string;
 
   @ApiProperty({
+    description: 'Start date',
+    example: '2024-04-01T10:00:00Z',
+  })
+  @Expose()
+  startDate?: string;
+
+  @ApiProperty({
+    description: 'End date',
+    example: '2024-06-01T10:00:00Z',
+  })
+  @Expose()
+  endDate?: string;
+
+  @ApiProperty({
     description: 'Description',
     example: 'Learn the basics of programming',
   })

@@ -36,8 +36,15 @@ export class CourseService {
     }
   }
 
-  findAll() {
-    return `This action returns all course`;
+  async findAll(): Promise<CourseInfoDto[]> {
+    try {
+      const courses = await this.courseRepository.find();
+      return courses.map((course) => plainToClass(CourseInfoDto, course));
+    } catch (error) {
+      throw new EcommerceBadRequestException(
+        `Failed to fetch courses: ${error.message}`,
+      );
+    }
   }
 
   findOne(id: number) {

@@ -9,6 +9,7 @@ import {
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { PhoneCode } from '@enums';
 import { Exclude, Expose } from 'class-transformer';
+import { DegreeType } from '@entities';
 
 @Exclude()
 export class ProfileInfoDto {
@@ -39,6 +40,24 @@ export class ProfileInfoDto {
   @Length(1, 255)
   @Expose()
   lastName?: string;
+
+  @ApiPropertyOptional({
+    enum: DegreeType,
+    description: 'Degree of the user',
+  })
+  @IsOptional()
+  @IsString()
+  @Expose()
+  degree?: DegreeType;
+
+  @ApiPropertyOptional({
+    type: Number,
+    description: 'Years of experience of the user',
+    example: 5,
+  })
+  @IsOptional()
+  @Expose()
+  experienceYears?: number;
 
   @ApiProperty({
     type: String,
