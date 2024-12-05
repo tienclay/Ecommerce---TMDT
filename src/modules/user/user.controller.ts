@@ -16,7 +16,7 @@ import {
 } from '@nestjs/swagger';
 import { AuthGuard, RolesGuard } from '@guards';
 import { CurrentUser, EcommerceApiResponse, Roles } from '@decorators';
-import { User } from '@entities';
+import { Order, Payment, User } from '@entities';
 import { EcommerceForbiddenException } from '@exceptions';
 import { UserInfoDto } from './dto/user-info.dto';
 import { UserRole } from '@enums';
@@ -28,6 +28,7 @@ import {
   LikeStatusDto,
   StatusResponseDto,
 } from './dto/status-like.dto';
+import { OrderDto } from '../order/dto/order.dto';
 @Controller('users')
 @ApiTags('User')
 export class UserController {
@@ -174,5 +175,23 @@ export class UserController {
   })
   async findAll(): Promise<UserInfoDto[]> {
     return this.userService.findAll();
+  }
+
+  //get all orders
+  @Get(':userId/orders')
+  @ApiOperation({ summary: 'Get orders by user id' })
+  @EcommerceApiResponse(Order, true)
+  async getOrdersByUserId(@Param('userId') userId: string): Promise<Order[]> {
+    return this.userService.getOrdersByUserId(userId);
+  }
+
+  //get all payments
+  @Get(':userId/payments')
+  @ApiOperation({ summary: 'Get payments by user id' })
+  @EcommerceApiResponse(Payment, true)
+  async getPaymentsByUserId(
+    @Param('userId') userId: string,
+  ): Promise<Payment[]> {
+    return this.userService.getPaymentsByUserId(userId);
   }
 }

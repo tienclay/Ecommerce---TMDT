@@ -22,6 +22,7 @@ import { UserRole } from '@enums';
 import { AuthGuard, RolesGuard } from '@guards';
 import { CourseInfoDto } from './dto/course-info.dto';
 import { ReviewDto } from '../review/dto/review.dto';
+import { WeeklyPlan } from '@entities';
 
 @Controller('courses')
 @ApiTags('Course')
@@ -115,5 +116,19 @@ export class CourseController {
     @Param('courseId') courseId: string,
   ): Promise<ReviewDto[]> {
     return this.courseService.getReviewsForCourse(courseId);
+  }
+
+  //get all weekly plans
+  @Get(':courseId/weekly-plans')
+  @ApiOperation({ summary: 'Get weekly plans by course id' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of weekly plans for the course',
+    type: [WeeklyPlan],
+  })
+  async getWeeklyPlansForCourse(
+    @Param('courseId') courseId: string,
+  ): Promise<WeeklyPlan[]> {
+    return this.courseService.getWeeklyPlansForCourse(courseId);
   }
 }
