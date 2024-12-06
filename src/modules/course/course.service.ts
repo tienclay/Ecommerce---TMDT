@@ -38,7 +38,9 @@ export class CourseService {
 
   async findAll(): Promise<CourseInfoDto[]> {
     try {
-      const courses = await this.courseRepository.find();
+      const courses = await this.courseRepository.find({
+        relations: ['fees'],
+      });
       return courses.map((course) => plainToClass(CourseInfoDto, course));
     } catch (error) {
       throw new EcommerceBadRequestException(
