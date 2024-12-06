@@ -10,13 +10,24 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderDto } from './dto/order.dto';
-import { Order } from '@entities';
+import { Order, User } from '@entities';
+import { CreateOrderByAccessTokenDto } from './dto/create-order-ignore-user-id.dto';
+import { CurrentUser, Roles } from '@decorators';
+import { UserRole } from '@enums';
+import { AuthGuard, RolesGuard } from '@guards';
 
 @ApiTags('Orders')
 @Controller('orders')
@@ -32,6 +43,23 @@ export class OrderController {
   })
   create(@Body() createOrderDto: CreateOrderDto): Promise<Order> {
     return this.orderService.create(createOrderDto);
+  }
+
+  @Post('create')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.STUDENT)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Tạo đơn hàng mới by access-token' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Đơn hàng được tạo thành công',
+    type: OrderDto,
+  })
+  createByAccessToken(
+    @Body() createOrderDto: CreateOrderByAccessTokenDto,
+    @CurrentUser() user: User,
+  ): Promise<OrderDto> {
+    return this.orderService.createByAccessToken(createOrderDto, user.id);
   }
 
   @Get()

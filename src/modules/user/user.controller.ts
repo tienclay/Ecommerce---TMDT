@@ -185,6 +185,17 @@ export class UserController {
     return this.userService.getOrdersByUserId(userId);
   }
 
+  @Get(':userId/orders-access-token')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get orders by user id' })
+  @EcommerceApiResponse(Order, true)
+  async getOrdersByUserAccessToken(
+    @CurrentUser() user: User,
+  ): Promise<Order[]> {
+    return this.userService.getOrdersByUserId(user.id);
+  }
+
   //get all payments
   @Get(':userId/payments')
   @ApiOperation({ summary: 'Get payments by user id' })

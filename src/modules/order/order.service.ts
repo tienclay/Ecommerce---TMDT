@@ -10,6 +10,8 @@ import {
   EcommerceBadRequestException,
   EcommerceNotFoundException,
 } from '@exceptions';
+import { CreateOrderByAccessTokenDto } from './dto/create-order-ignore-user-id.dto';
+import { OrderDto } from './dto/order.dto';
 
 @Injectable()
 export class OrderService {
@@ -23,6 +25,22 @@ export class OrderService {
     try {
       const order = this.orderRepository.create(createOrderDto);
       return this.orderRepository.save(order);
+    } catch (error) {
+      throw new EcommerceBadRequestException(error.message);
+    }
+  }
+
+  async createByAccessToken(
+    createOrderDto: CreateOrderByAccessTokenDto,
+    userId: string,
+  ): Promise<OrderDto> {
+    try {
+      const order = this.orderRepository.create({
+        ...createOrderDto,
+        studentId: userId,
+      });
+      const orderRecord = await this.orderRepository.save(order);
+      return orderRecord;
     } catch (error) {
       throw new EcommerceBadRequestException(error.message);
     }
