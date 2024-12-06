@@ -12,6 +12,7 @@ import { EcommerceNotFoundException } from '@exceptions';
 import { CourseTutorInfoDto } from './dto/course-tutor-info.dto';
 import { UserRole } from '@enums';
 import { ReviewDto } from '../review/dto/review.dto';
+import { isUUID } from 'class-validator';
 
 @Injectable()
 export class CourseService {
@@ -49,8 +50,22 @@ export class CourseService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} course`;
+  async findOne(id: string): Promise<Course> {
+    try {
+      if (!isUUID(id)) {
+        throw new EcommerceBadRequestException('Invalid course ID format');
+      }
+      const course = this.courseRepository.findOne({
+        where: { id },
+        relations: ['fees'],
+      });
+      if (!course) {
+        throw new EcommerceNotFoundException('Course not found');
+      }
+      return course;
+    } catch (error) {
+      throw error;
+    }
   }
 
   async update(

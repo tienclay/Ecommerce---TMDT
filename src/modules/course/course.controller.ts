@@ -22,7 +22,7 @@ import { UserRole } from '@enums';
 import { AuthGuard, RolesGuard } from '@guards';
 import { CourseInfoDto } from './dto/course-info.dto';
 import { ReviewDto } from '../review/dto/review.dto';
-import { WeeklyPlan } from '@entities';
+import { Course, WeeklyPlan } from '@entities';
 
 @Controller('courses')
 @ApiTags('Course')
@@ -56,8 +56,14 @@ export class CourseController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.courseService.findOne(+id);
+  @ApiOperation({ summary: 'Get course by id' })
+  @ApiResponse({
+    status: 200,
+    description: 'Course found',
+    type: Course,
+  })
+  async findOne(@Param('id') id: string): Promise<Course> {
+    return this.courseService.findOne(id);
   }
 
   @Patch(':courseId')
