@@ -110,7 +110,11 @@ export class PaymentService {
       }
 
       if (order.status === OrderStatus.PROCESSING) {
-        throw new EcommerceBadRequestException('Order is processing');
+        const payment = await this.paymentRepository.findOne({
+          where: { orderId },
+        });
+        const checkoutUrl = payment.checkoutUrl;
+        return plainToClass(PaymentResponseDto, { checkoutUrl });
       }
 
       const responseData: PaymentResponseDto =
@@ -118,7 +122,6 @@ export class PaymentService {
       if (!responseData) {
         throw new EcommerceBadRequestException('Payment creation failed');
       }
-      console.log('object :>> ', responseData.orderCode);
       const responseInfo = await firstValueFrom(
         this.httpService.get(`/payments/${responseData.orderCode}`),
       );
