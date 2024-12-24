@@ -33,6 +33,16 @@ import { OrderDto } from '../order/dto/order.dto';
 @ApiTags('User')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+  @Get('courses')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get courses of current user' })
+  @EcommerceApiResponse(CourseInfoDto, true)
+  async getCourses(@CurrentUser() user: User): Promise<CourseInfoDto[]> {
+    const userId = user.id;
+    return this.userService.getCoursesByUserId(userId);
+  }
+
   @Get(':userId')
   @UseGuards(AuthGuard)
   @ApiBearerAuth('access-token')
