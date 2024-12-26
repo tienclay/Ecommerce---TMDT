@@ -42,6 +42,8 @@ export class UserController {
     const userId = user.id;
     return this.userService.getCoursesByUserId(userId);
   }
+  
+  
 
   @Get(':userId')
   @UseGuards(AuthGuard)

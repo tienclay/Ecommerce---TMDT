@@ -13,13 +13,20 @@ import {
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
-import { ApiHeader, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiHeader,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CurrentUser, EcommerceApiResponse } from '@decorators';
 import { UserOutputDto } from './dto/user-output.dto';
 import { ResponseAuthDto } from './dto/response-auth.dto';
 import { LoginDto } from './dto/login-input.dto';
 import { GenerateTokenInfoDto } from './dto/generate-token-info.dto';
-import { TokenGuard } from '@guards';
+import { AuthGuard, TokenGuard } from '@guards';
+import { User } from '@entities';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -37,6 +44,19 @@ export class AuthController {
   @EcommerceApiResponse(UserOutputDto)
   create(@Body() createAuthDto: CreateAuthDto) {
     return this.authService.create(createAuthDto);
+  }
+
+  @Get('me')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get current user' })
+  @ApiResponse({
+    status: 200,
+    description: 'Current user found',
+    type: UserOutputDto,
+  })
+  getMe(@CurrentUser() user: User) {
+    return user;
   }
 
   @Post('login')
