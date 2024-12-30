@@ -19,6 +19,8 @@ import { PaymentModule } from './modules/payment/payment.module';
 import { OrderModule } from './modules/order/order.module';
 import { ReviewModule } from './modules/review/review.module';
 import { WeeklyPlanModule } from './modules/weekly-plan/weekly-plan.module';
+import { EmailModule } from './modules/email/email.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 const modules = [AuthModule, UserModule];
 
@@ -60,6 +62,7 @@ const modules = [AuthModule, UserModule];
     //   type: 'single',
     //   url: process.env.REDIS_URL,
     // }),
+    EventEmitterModule.forRoot(),
     ...modules,
     UserModule,
     ProfileModule,
@@ -71,6 +74,7 @@ const modules = [AuthModule, UserModule];
     OrderModule,
     ReviewModule,
     WeeklyPlanModule,
+    EmailModule,
   ],
   providers: [
     {

@@ -33,9 +33,7 @@ export class ReviewController {
     @Body() createReviewDto: CreateReviewDto,
     @CurrentUser() user: User,
   ): Promise<ReviewDto> {
-    console.log('user.id :>> ', user.id);
     createReviewDto.studentId = user.id;
-    console.log('1 :>> ', 1);
     return this.reviewService.create(createReviewDto);
   }
 }
