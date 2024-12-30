@@ -8,6 +8,7 @@ import {
   CourseTutor,
   Like,
   Order,
+  OrderStatus,
   Payment,
   Profile,
   Review,
@@ -107,7 +108,7 @@ export class UserService {
       if (user.role === UserRole.STUDENT) {
         // Get courses from orders for students
         const orders = await this.orderRepository.find({
-          where: { studentId: userId },
+          where: { studentId: userId, status: OrderStatus.COMPLETED },
           relations: ['course'],
         });
         courses = orders.map((order) => order.course);
