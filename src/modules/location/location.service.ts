@@ -26,8 +26,9 @@ export class LocationService {
     }
   }
 
-  findAll() {
-    return `This action returns all location`;
+  async findAll() {
+    const locations = await this.locationRepository.find();
+    return locations;
   }
 
   findOne(id: number) {
