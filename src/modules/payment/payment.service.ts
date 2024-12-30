@@ -25,11 +25,13 @@ import { PaymentResponseDto } from './dto/payment-response.dto';
 import { PaymentLinkDto } from './dto/payment-link.dto';
 import { PaymentDto } from './dto/payment.dto';
 import { ConfirmWebhookDto } from './dto/confirm-webhook.dto';
-import { WebhookResponse } from './dto/webhook-data.dto';
+import { WebhookDataDto, WebhookResponse } from './dto/webhook-data.dto';
 import { CancelPaymentDto } from './dto/cancel.dto';
+import PayOS from '@payos/node';
 
 @Injectable()
 export class PaymentService {
+  private payOS: PayOS;
   constructor(
     @InjectRepository(Payment)
     private paymentRepository: Repository<Payment>,
@@ -37,7 +39,13 @@ export class PaymentService {
     private orderRepository: Repository<Order>,
     private configService: ConfigService,
     private httpService: HttpService,
-  ) {}
+  ) {
+    this.payOS = new PayOS(
+      process.env.PAYOS_CLIENT_ID,
+      process.env.PAYOS_API_KEY,
+      process.env.PAYOS_CHECKSUM_KEY,
+    );
+  }
   private readonly logger = new Logger(PaymentService.name);
 
   private readonly MAX_RETRIES = 5;
@@ -220,9 +228,23 @@ export class PaymentService {
     }
   }
 
-  async handleWebhook(webhookData: WebhookResponse): Promise<void> {
+  verifyPaymentWebhookData(data): WebhookDataDto {
+    return this.payOS.verifyPaymentWebhookData(data);
+  }
+
+  async handleWebhook(body: any): Promise<WebhookDataDto> {
     try {
-      const data = webhookData.data;
+      console.log('body :>> ', body);
+      const webhookData = this.verifyPaymentWebhookData(body);
+      if (
+        ['Ma giao dich thu nghiem', 'VQRIO123'].includes(
+          webhookData.description,
+        )
+      ) {
+        return webhookData;
+      }
+      const data = webhookData;
+      console.log('data :>> ', data);
       if (data.desc != 'success') {
         return;
       }
