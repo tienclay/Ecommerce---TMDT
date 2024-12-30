@@ -13,7 +13,12 @@ import { CreateLocationDto } from './dto/create-location.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
 import { UserRole } from '@enums';
 import { AuthGuard, RolesGuard } from '@guards';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Roles } from '@decorators';
 import { LocationInfoDto } from './dto/location-info.dto';
 @ApiTags('Location')
@@ -25,6 +30,7 @@ export class LocationController {
   @UseGuards(AuthGuard, RolesGuard)
   @ApiBearerAuth('access-token')
   @Roles(UserRole.ADMIN, UserRole.TUTOR)
+  @ApiOperation({ summary: 'Create location' })
   @ApiResponse({
     status: 201,
     description: 'Location created',
@@ -37,7 +43,14 @@ export class LocationController {
   }
 
   @Get()
-  findAll() {
+  @ApiOperation({ summary: 'Get all locations' })
+  @ApiResponse({
+    status: 200,
+    description: 'Get all locations',
+    type: LocationInfoDto,
+    isArray: true,
+  })
+  async findAll() {
     return this.locationService.findAll();
   }
 
