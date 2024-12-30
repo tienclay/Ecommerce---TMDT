@@ -23,7 +23,7 @@ import { PaymentResponseDto } from './dto/payment-response.dto';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { PaymentLinkDto } from './dto/payment-link.dto';
 import { ConfirmWebhookDto } from './dto/confirm-webhook.dto';
-import { WebhookResponse } from './dto/webhook-data.dto';
+import { WebhookDataDto, WebhookResponse } from './dto/webhook-data.dto';
 import { CancelPaymentDto } from './dto/cancel.dto';
 
 @Controller('payments')
@@ -66,7 +66,7 @@ export class PaymentController {
 
   @Post('handle-webhook')
   @HttpCode(200)
-  async handleWebhook(@Body() webhookData: WebhookResponse) {
+  async handleWebhook(@Body() webhookData: any): Promise<WebhookDataDto> {
     return await this.paymentService.handleWebhook(webhookData);
   }
 
