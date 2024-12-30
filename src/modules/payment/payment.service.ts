@@ -28,6 +28,8 @@ import { ConfirmWebhookDto } from './dto/confirm-webhook.dto';
 import { WebhookDataDto, WebhookResponse } from './dto/webhook-data.dto';
 import { CancelPaymentDto } from './dto/cancel.dto';
 import PayOS from '@payos/node';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { ItemDto } from './dto/event-order.dto.js';
 
 @Injectable()
 export class PaymentService {
@@ -39,6 +41,7 @@ export class PaymentService {
     private orderRepository: Repository<Order>,
     private configService: ConfigService,
     private httpService: HttpService,
+    private readonly eventEmitter: EventEmitter2,
   ) {
     this.payOS = new PayOS(
       process.env.PAYOS_CLIENT_ID,
@@ -234,7 +237,6 @@ export class PaymentService {
 
   async handleWebhook(body: any): Promise<WebhookDataDto> {
     try {
-      console.log('body :>> ', body);
       const webhookData = this.verifyPaymentWebhookData(body);
       if (
         ['Ma giao dich thu nghiem', 'VQRIO123'].includes(
@@ -244,7 +246,6 @@ export class PaymentService {
         return webhookData;
       }
       const data = webhookData;
-      console.log('data :>> ', data);
       if (data.desc != 'success') {
         return;
       }
@@ -261,9 +262,22 @@ export class PaymentService {
       this.paymentRepository.save(payment);
       const order = await this.orderRepository.findOne({
         where: { id: payment.orderId },
+        relations: ['student'],
       });
       order.status = OrderStatus.COMPLETED;
       this.orderRepository.save(order);
+      // export class itemDto {
+      //   name: string;
+      //   quantity: number;
+      //   price: number;
+      // }
+      //emit event "order.success"
+
+      this.eventEmitter.emit('order.success', {
+        orderId: order.id,
+        email: order.student.email,
+        name: order.student.username,
+      });
     } catch (error) {
       this.logger.error(error);
       throw new EcommerceBadRequestException('Handle webhook failed');

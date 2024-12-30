@@ -27,6 +27,7 @@
     "seed": "ts-node -r tsconfig-paths/register ./node_modules/typeorm-extension/dist/cli/index.js seed -d ormconfig"
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@nestjs-modules/ioredis": "^2.0.2",
     "@nestjs-modules/mailer": "^2.0.2",
     "@nestjs/axios": "^3.1.2",
